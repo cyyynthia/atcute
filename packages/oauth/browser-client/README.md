@@ -5,16 +5,13 @@ minimal OAuth browser client implementation for AT Protocol.
 - **only the bare minimum**: enough code to get authentication reasonably working, with only one
   happy path is supported (only ES256 keys for DPoP. PKCE and DPoP-bound PAR is required.)
 - **does not use IndexedDB**: makes the library work under Safari's lockdown mode, and has less
-  [maintenance headache][indexeddb-woes] overall, but it also means this is "less secure" (it won't
-  be able to use non-exportable keys as recommended by [DPoP specification][idb-dpop-spec].)
-- **no independent DNS/HTTP handle checks**: the default handle resolver makes use of Bluesky's
-  AppView to retrieve the correct DID identifier. you should be able to write your own resolver
-  function that'll resolve via DNS-over-HTTPS or via other PDSes.
+  maintenance headache overall, but it also means this is "less secure" (it won't be able to use
+  non-exportable keys as recommended by [DPoP specification][idb-dpop-spec].)
+  [this guide](#doing-handle-resolution) if you want to implement your own resolver code.
 - **not well-tested**: it has been used in personal projects for quite some time, but hasn't seen
   any use outside of that. using the [reference implementation][oauth-atproto-lib] is recommended if
   you are unsure about the implications presented here.
 
-[indexeddb-woes]: https://gist.github.com/pesterhazy/4de96193af89a6dd5ce682ce2adff49a
 [idb-dpop-spec]: https://datatracker.ietf.org/doc/html/rfc9449#section-2-4
 [oauth-atproto-lib]: https://npm.im/@atproto/oauth-client-browser
 
@@ -37,6 +34,14 @@ configureOAuth({
 ```
 
 ### starting an authorization flow
+
+> [!CAUTION]  
+> the built-in handle resolution makes use of Bluesky-hosted services to return the intended DID,
+> and this can mean sharing the user's IP address and the handle identifiers to Bluesky.
+>
+> while Bluesky has a declared privacy policy, both developers and users need to be informed and
+> aware of the privacy implications of this arrangement. read [this guide](#doing-handle-resolution)
+> on how you can implement your own resolution code.
 
 if your application involves asking for the user's handle or DID, you can use `resolveFromIdentity`
 which resolves the user's identity to get its PDS, and the metadata of its authorization server.
@@ -260,3 +265,187 @@ const authUrl = await createAuthorizationUrl({
 
 adjust the code here as necessary, the plugin adds more environment variables than what is actually
 needed, you can remove them if you don't think you'd need it.
+
+### doing handle resolution
+
+there are two ways that a handle can be verified:
+
+1. HTTP verification: there is a file at `/.well-known/atproto-did` containing your account's DID
+2. DNS verification: there is a valid DNS TXT record on the domain containing your account's DID
+
+you'd want to resolve both of these. if both methods return a response but does not match each other
+then it should ideally be thrown.
+
+verify that the DID matches the intended format
+
+```ts
+const isDid = (did: string): did is At.DID => {
+	return /^did:([a-z]+):([a-zA-Z0-9._:%-]*[a-zA-Z0-9._-])$/.test(did);
+};
+```
+
+pass this resolved DID to `resolveFromIdentity`, and carry on as per usual.
+
+#### HTTP handle resolution
+
+this is very straightforward, make a request to `https://<handle>/.well-known/atproto-did` without
+following redirects. check if the response status is 200 and trim off any excess whitespaces.
+
+some web servers might not set a permissible CORS header to access this resource, in which case
+there is nothing that can be done, unless you'd want to proxy the requests.
+
+```ts
+const resolveHandleViaHttp = async (handle: string): At.DID => {
+	const url = new URL('/.well-known/atproto-did', `https://${handle}`);
+
+	const response = await fetch(url, { redirect: 'error' });
+	if (!response.ok) {
+		throw new ResolverError(`domain is unreachable`);
+	}
+
+	const text = await response.text();
+
+	const did = text.split('\n')[0]!.trim();
+	if (isDid(did)) {
+		return did;
+	}
+
+	throw new ResolverError(`failed to resolve ${handle}`);
+};
+```
+
+#### DNS handle resolution
+
+as websites can't do DNS resolution on their own, we'd have to rely on DNS-over-HTTPS (DoH)
+services. specifically, we want a DoH service that supports `application/dns-json` format. it should
+be noted that this _can_ have privacy implications of its own, please read through the privacy
+policy of whichever DoH service you end up using and make the user aware of it as well.
+
+for this example, we'll be using Cloudflare's DoH resolver for Firefox ([privacy
+policy][cf-resolver-firefox-privacy]) as it has support for `application/dns-json` format which
+allows us to query and see the responses in JSON.
+
+```ts
+const PREFIX = `did=`;
+
+const resolveHandleViaDoH = async (handle: string): At.DID => {
+	const url = new URL(`https://mozilla.cloudflare-dns.com/dns-query`);
+	url.searchParams.set('type', 'TXT');
+	url.searchParams.set('name', handle);
+
+	const response = await fetch(url, {
+		method: 'GET',
+		headers: { accept: 'application/dns-json' },
+		redirect: 'follow',
+	});
+
+	const type = response.headers.get('content-type')?.trim();
+	if (!response.ok) {
+		const message = type?.startsWith('text/plain')
+			? await response.text()
+			: `failed to resolve ${hostname}`;
+
+		throw new ResolverError(message);
+	}
+
+	if (type !== 'application/dns-json') {
+		throw new ResolverError('unexpected response from DoH server');
+	}
+
+	const result = asResult(await response.json());
+	const answers = result.Answer?.filter(isAnswerTxt).map(extractTxtData) ?? [];
+
+	for (let i = 0; i < results.length; i++) {
+		// If the line does not start with "did=", skip it
+		if (!results[i].startsWith(PREFIX)) {
+			continue;
+		}
+
+		// Ensure no other entry starting with "did=" follows
+		for (let j = i + 1; j < results.length; j++) {
+			if (results[j].startsWith(PREFIX)) {
+				break;
+			}
+		}
+
+		const did = results[i].slice(PREFIX.length);
+		if (isDid(did)) {
+			return did;
+		}
+
+		break;
+	}
+
+	throw new ResolverError(`failed to resolve ${handle}`);
+};
+
+type Result = { Status: number; Answer?: Answer[] };
+const isResult = (result: unknown): result is Result => {
+	if (result === null || typeof result !== 'object') {
+		return false;
+	}
+
+	if (typeof result.Status !== 'number') {
+		return false;
+	}
+
+	if (result.Answer) {
+		if (!Array.isArray(result.Answer) || !result.Answer.every(isAnswer)) {
+			return false;
+		}
+	}
+
+	return true;
+};
+const asResult = (result: unknown): Result => {
+	if (!isResult(result)) {
+		throw new TypeError('Invalid DoH response');
+	}
+
+	return result;
+};
+
+type Answer = { name: string; type: number; data: string; TTL: number };
+const isAnswer = (answer: unknown): answer is Answer => {
+	if (answer === null || typeof answer !== 'object') {
+		return false;
+	}
+
+	return (
+		typeof answer.name === 'string' &&
+		typeof answer.type === 'number' &&
+		typeof answer.data === 'string' &&
+		typeof answer.TTL === 'number'
+	);
+};
+
+type AnswerTxt = Answer & { type: 16 };
+const isAnswerTxt = (answer: Answer): answer is AnswerTxt => {
+	return answer.type === 16;
+};
+
+const extractTxtData = (answer: AnswerTxt): string => {
+	return answer.data.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+};
+```
+
+[cf-resolver-firefox-privacy]:
+	https://developers.cloudflare.com/1.1.1.1/privacy/cloudflare-resolver-firefox/
+
+#### using your PDS for handle resolution
+
+alternatively, if you operate your own PDS, you can make use of it as a handle resolver.
+
+```ts
+const resolveHandleViaPds = async (handle: string): At.DID => {
+	const rpc = new XRPC({ handler: simpleFetchHandler({ service: `https://my-pds.example.com` }) });
+
+	const { data } = await rpc.get('com.atproto.identity.resolveHandle', {
+		params: {
+			handle: handle,
+		},
+	});
+
+	return data.did;
+};
+```
