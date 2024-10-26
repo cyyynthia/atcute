@@ -11,11 +11,37 @@ export interface RichtextSegment {
 	features: FacetFeature[] | undefined;
 }
 
-const decoder = new TextDecoder();
-const encoder = new TextEncoder();
+const getUtf8Size = (str: string, index: number): number => {
+	const code = str.codePointAt(index)!;
 
-const slice = (bytes: Uint8Array, start?: number, end?: number) => {
-	return decoder.decode(bytes.subarray(start, end));
+	if (code <= 0x7f) {
+		return 1;
+	} else if (code <= 0x7ff) {
+		return 2;
+	} else if (code <= 0xffff) {
+		return 3;
+	} else {
+		return 4;
+	}
+};
+
+const getUtf8To16Mapping = (str: string): number[] => {
+	const map: number[] = [];
+	const len = str.length;
+
+	let u16pos = 0;
+
+	while (u16pos < len) {
+		const code = str.codePointAt(u16pos)!;
+
+		for (let i = getUtf8Size(str, u16pos); i--; ) {
+			map.push(u16pos);
+		}
+
+		u16pos += code > 0xffff ? 2 : 1;
+	}
+
+	return map;
 };
 
 const segment = (text: string, features: FacetFeature[] | undefined): RichtextSegment => {
@@ -27,8 +53,8 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 		return [segment(text, undefined)];
 	}
 
-	const bytes = encoder.encode(text);
-	const length = bytes.byteLength;
+	const map = getUtf8To16Mapping(text);
+	const length = map.length;
 
 	const segments: RichtextSegment[] = [];
 
@@ -42,14 +68,16 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 		const { byteStart, byteEnd } = facet.index;
 
 		if (textCursor < byteStart) {
-			segments.push(segment(slice(bytes, textCursor, byteStart), undefined));
+			const subtext = text.slice(map[textCursor], map[byteStart]);
+
+			segments.push(segment(subtext, undefined));
 		} else if (textCursor > byteStart) {
 			facetCursor++;
 			continue;
 		}
 
 		if (byteStart < byteEnd) {
-			const subtext = slice(bytes, byteStart, byteEnd);
+			const subtext = text.slice(map[byteStart], map[byteEnd]);
 			const features = facet.features;
 
 			if (features.length === 0 || subtext.trim().length === 0) {
@@ -64,7 +92,9 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 	} while (facetCursor < facetsLength);
 
 	if (textCursor < length) {
-		segments.push(segment(slice(bytes, textCursor, length), undefined));
+		const subtext = text.slice(map[textCursor]);
+
+		segments.push(segment(subtext, undefined));
 	}
 
 	return segments;

@@ -3,7 +3,7 @@ import { segmentize } from './index.js';
 
 it('does utf8 slicing', () => {
 	expect(
-		segmentize('one👨‍👩‍👧‍👧 two👨‍👩‍👧‍👧 three👨‍👩‍👧‍👧', [
+		segmentize('one👨‍👩‍👧‍👧 two👨‍👩‍👧‍👧 three👨‍👩‍👧‍👧 ', [
 			{
 				index: { byteStart: 0, byteEnd: 28 },
 				features: [{ $type: 'app.bsky.richtext.facet#tag', tag: '' }],
@@ -37,6 +37,10 @@ it('does utf8 slicing', () => {
 		{
 			text: 'three👨‍👩‍👧‍👧',
 			features: [{ $type: 'app.bsky.richtext.facet#tag', tag: '' }],
+		},
+		{
+			text: ' ',
+			features: undefined,
 		},
 	]);
 });
