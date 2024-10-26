@@ -270,7 +270,7 @@ needed, you can remove them if you don't think you'd need it.
 there are two ways that a handle can be verified:
 
 1. HTTP verification: there is a file at `/.well-known/atproto-did` containing your account's DID
-2. DNS verification: there is a valid DNS TXT record on the domain containing your account's DID
+2. DNS verification: there is an `_atproto` TXT record containing your account's DID
 
 you'd want to resolve both of these. if both methods return a response but does not match each other
 then it should ideally be thrown.
@@ -294,7 +294,7 @@ some web servers might not set a permissible CORS header to access this resource
 there is nothing that can be done, unless you'd want to proxy the requests.
 
 ```ts
-const resolveHandleViaHttp = async (handle: string): At.DID => {
+const resolveHandleViaHttp = async (handle: string): Promise<At.DID> => {
 	const url = new URL('/.well-known/atproto-did', `https://${handle}`);
 
 	const response = await fetch(url, { redirect: 'error' });
@@ -325,12 +325,13 @@ policy][cf-resolver-firefox-privacy]) as it has support for `application/dns-jso
 allows us to query and see the responses in JSON.
 
 ```ts
-const PREFIX = `did=`;
+const SUBDOMAIN = '_atproto';
+const PREFIX = 'did=';
 
-const resolveHandleViaDoH = async (handle: string): At.DID => {
-	const url = new URL(`https://mozilla.cloudflare-dns.com/dns-query`);
+const resolveHandleViaDoH = async (handle: string): Promise<At.DID> => {
+	const url = new URL('https://mozilla.cloudflare-dns.com/dns-query');
 	url.searchParams.set('type', 'TXT');
-	url.searchParams.set('name', handle);
+	url.searchParams.set('name', `${SUBDOMAIN}.${handle}`);
 
 	const response = await fetch(url, {
 		method: 'GET',
@@ -342,32 +343,32 @@ const resolveHandleViaDoH = async (handle: string): At.DID => {
 	if (!response.ok) {
 		const message = type?.startsWith('text/plain')
 			? await response.text()
-			: `failed to resolve ${hostname}`;
+			: `failed to resolve ${handle}`;
 
 		throw new ResolverError(message);
 	}
 
 	if (type !== 'application/dns-json') {
-		throw new ResolverError('unexpected response from DoH server');
+		throw new ResolverError(`unexpected response from DoH server`);
 	}
 
 	const result = asResult(await response.json());
 	const answers = result.Answer?.filter(isAnswerTxt).map(extractTxtData) ?? [];
 
-	for (let i = 0; i < results.length; i++) {
+	for (let i = 0; i < answers.length; i++) {
 		// If the line does not start with "did=", skip it
-		if (!results[i].startsWith(PREFIX)) {
+		if (!answers[i].startsWith(PREFIX)) {
 			continue;
 		}
 
 		// Ensure no other entry starting with "did=" follows
-		for (let j = i + 1; j < results.length; j++) {
-			if (results[j].startsWith(PREFIX)) {
+		for (let j = i + 1; j < answers.length; j++) {
+			if (answers[j].startsWith(PREFIX)) {
 				break;
 			}
 		}
 
-		const did = results[i].slice(PREFIX.length);
+		const did = answers[i].slice(PREFIX.length);
 		if (isDid(did)) {
 			return did;
 		}
@@ -384,21 +385,15 @@ const isResult = (result: unknown): result is Result => {
 		return false;
 	}
 
-	if (typeof result.Status !== 'number') {
-		return false;
-	}
-
-	if (result.Answer) {
-		if (!Array.isArray(result.Answer) || !result.Answer.every(isAnswer)) {
-			return false;
-		}
-	}
-
-	return true;
+	return (
+		'Status' in result &&
+		typeof result.Status === 'number' &&
+		(!('Answer' in result) || (Array.isArray(result.Answer) && result.Answer.every(isAnswer)))
+	);
 };
 const asResult = (result: unknown): Result => {
 	if (!isResult(result)) {
-		throw new TypeError('Invalid DoH response');
+		throw new TypeError(`unexpected DoH response`);
 	}
 
 	return result;
@@ -411,9 +406,13 @@ const isAnswer = (answer: unknown): answer is Answer => {
 	}
 
 	return (
+		'name' in answer &&
 		typeof answer.name === 'string' &&
+		'type' in answer &&
 		typeof answer.type === 'number' &&
+		'data' in answer &&
 		typeof answer.data === 'string' &&
+		'TTL' in answer &&
 		typeof answer.TTL === 'number'
 	);
 };
@@ -436,7 +435,7 @@ const extractTxtData = (answer: AnswerTxt): string => {
 alternatively, if you operate your own PDS, you can make use of it as a handle resolver.
 
 ```ts
-const resolveHandleViaPds = async (handle: string): At.DID => {
+const resolveHandleViaPds = async (handle: string): Promise<At.DID> => {
 	const rpc = new XRPC({ handler: simpleFetchHandler({ service: `https://my-pds.example.com` }) });
 
 	const { data } = await rpc.get('com.atproto.identity.resolveHandle', {
