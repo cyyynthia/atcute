@@ -7,7 +7,6 @@ minimal OAuth browser client implementation for AT Protocol.
 - **does not use IndexedDB**: makes the library work under Safari's lockdown mode, and has less
   maintenance headache overall, but it also means this is "less secure" (it won't be able to use
   non-exportable keys as recommended by [DPoP specification][idb-dpop-spec].)
-  [this guide](#doing-handle-resolution) if you want to implement your own resolver code.
 - **not well-tested**: it has been used in personal projects for quite some time, but hasn't seen
   any use outside of that. using the [reference implementation][oauth-atproto-lib] is recommended if
   you are unsure about the implications presented here.
