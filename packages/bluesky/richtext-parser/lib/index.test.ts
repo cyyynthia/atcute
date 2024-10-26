@@ -34,6 +34,19 @@ it('escapes', () => {
 		},
 	]);
 
+	expect(tokenize('\\＠bsky.app')).toEqual([
+		{
+			type: 'escape',
+			raw: '\\＠',
+			escaped: '＠',
+		},
+		{
+			type: 'text',
+			raw: 'bsky.app',
+			text: 'bsky.app',
+		},
+	]);
+
 	expect(tokenize('\\h')).toEqual([
 		{
 			type: 'text',
@@ -56,6 +69,14 @@ it('mentions', () => {
 		{
 			type: 'mention',
 			raw: '@bsky.app',
+			handle: 'bsky.app',
+		},
+	]);
+
+	expect(tokenize('＠bsky.app')).toEqual([
+		{
+			type: 'mention',
+			raw: '＠bsky.app',
 			handle: 'bsky.app',
 		},
 	]);
@@ -246,6 +267,14 @@ it('topics', () => {
 		{
 			type: 'topic',
 			raw: '#cool',
+			name: 'cool',
+		},
+	]);
+
+	expect(tokenize('＃cool')).toEqual([
+		{
+			type: 'topic',
+			raw: '＃cool',
 			name: 'cool',
 		},
 	]);
