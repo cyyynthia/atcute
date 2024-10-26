@@ -21,7 +21,7 @@
 	},
 	"devDependencies": {
 		"@ipld/dag-cbor": "^9.2.1",
-		"@types/bun": "^1.1.11",
+		"@types/bun": "^1.1.12",
 		"mitata": "^1.0.10"
 	},
 	"dependencies": {
