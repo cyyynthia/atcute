@@ -316,9 +316,9 @@ const resolveHandleViaHttp = async (handle: string): Promise<At.DID> => {
 #### DNS handle resolution
 
 as websites can't do DNS resolution on their own, we'd have to rely on DNS-over-HTTPS (DoH)
-services. specifically, we want a DoH service that supports `application/dns-json` format. it should
-be noted that this _can_ have privacy implications of its own, please read through the privacy
-policy of whichever DoH service you end up using and make the user aware of it as well.
+services. it should be noted that this _can_ have privacy implications of its own, please read
+through the privacy policy of whichever DoH service you end up using and make the user aware of it
+as well.
 
 for this example, we'll be using Cloudflare's DoH resolver for Firefox ([privacy
 policy][cf-resolver-firefox-privacy]) as it has support for `application/dns-json` format which
@@ -356,12 +356,12 @@ const resolveHandleViaDoH = async (handle: string): Promise<At.DID> => {
 	const answers = result.Answer?.filter(isAnswerTxt).map(extractTxtData) ?? [];
 
 	for (let i = 0; i < answers.length; i++) {
-		// If the line does not start with "did=", skip it
+		// skip if the line does not start with "did="
 		if (!answers[i].startsWith(PREFIX)) {
 			continue;
 		}
 
-		// Ensure no other entry starting with "did=" follows
+		// ensure there is no other entry starting with "did="
 		for (let j = i + 1; j < answers.length; j++) {
 			if (answers[j].startsWith(PREFIX)) {
 				break;
