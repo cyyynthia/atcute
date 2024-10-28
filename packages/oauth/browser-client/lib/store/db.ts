@@ -79,7 +79,7 @@ export const createOAuthDatabase = ({ name }: OAuthDatabaseOptions) => {
 				}
 			};
 
-			window.addEventListener('storage', listener, { signal });
+			globalThis.addEventListener('storage', listener, { signal });
 		}
 
 		{
