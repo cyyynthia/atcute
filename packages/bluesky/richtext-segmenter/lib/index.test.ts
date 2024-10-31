@@ -44,3 +44,19 @@ it('does utf8 slicing', () => {
 		},
 	]);
 });
+
+it('does not allow end<start', () => {
+	expect(
+		segmentize('abcd', [
+			{
+				index: { byteEnd: 2, byteStart: 4 },
+				features: [{ $type: 'app.bsky.richtext.facet#tag', tag: '' }],
+			},
+		]),
+	).toEqual([
+		{
+			text: 'abcd',
+			features: undefined,
+		},
+	]);
+});

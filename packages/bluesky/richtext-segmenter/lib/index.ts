@@ -67,24 +67,21 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 		const facet = facets[facetCursor];
 		const { byteStart, byteEnd } = facet.index;
 
-		if (textCursor < byteStart) {
-			const subtext = text.slice(map[textCursor], map[byteStart]);
-
-			segments.push(segment(subtext, undefined));
-		} else if (textCursor > byteStart) {
+		if (byteStart > byteEnd || textCursor > byteStart) {
 			facetCursor++;
 			continue;
+		} else if (textCursor < byteStart) {
+			const subtext = text.slice(map[textCursor], map[byteStart]);
+			segments.push(segment(subtext, undefined));
 		}
 
-		if (byteStart < byteEnd) {
-			const subtext = text.slice(map[byteStart], map[byteEnd]);
-			const features = facet.features;
+		const subtext = text.slice(map[byteStart], map[byteEnd]);
+		const features = facet.features;
 
-			if (features.length === 0 || subtext.trim().length === 0) {
-				segments.push(segment(subtext, undefined));
-			} else {
-				segments.push(segment(subtext, features));
-			}
+		if (features.length === 0 || subtext.trim().length === 0) {
+			segments.push(segment(subtext, undefined));
+		} else {
+			segments.push(segment(subtext, features));
 		}
 
 		textCursor = byteEnd;
