@@ -11,9 +11,7 @@ export interface RichtextSegment {
 	features: FacetFeature[] | undefined;
 }
 
-const getUtf8Size = (str: string, index: number): number => {
-	const code = str.codePointAt(index)!;
-
+const getUtf8Size = (code: number): number => {
 	if (code <= 0x7f) {
 		return 1;
 	} else if (code <= 0x7ff) {
@@ -34,7 +32,7 @@ const getUtf8To16Mapping = (str: string): number[] => {
 	while (u16pos < len) {
 		const code = str.codePointAt(u16pos)!;
 
-		for (let i = getUtf8Size(str, u16pos); i--; ) {
+		for (let i = getUtf8Size(code); i--; ) {
 			map.push(u16pos);
 		}
 
