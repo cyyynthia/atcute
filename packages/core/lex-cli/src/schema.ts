@@ -25,33 +25,53 @@ export const integerSchema = v.object({
 
 export type IntegerSchema = v.Infer<typeof integerSchema>;
 
-export const stringSchema = v.object({
-	type: v.literal('string'),
-	description: v.string().optional(),
-	format: v
-		.union(
-			v.literal('at-identifier'),
-			v.literal('at-uri'),
-			v.literal('cid'),
-			v.literal('datetime'),
-			v.literal('did'),
-			v.literal('handle'),
-			v.literal('language'),
-			v.literal('nsid'),
-			v.literal('record-key'),
-			v.literal('tid'),
-			v.literal('uri'),
-		)
-		.optional(),
-	default: v.string().optional(),
-	const: v.string().optional(),
-	enum: v.array(v.string()).optional(),
-	knownValues: v.array(v.string()).optional(),
-	maxLength: integerType.optional(),
-	minLength: integerType.optional(),
-	maxGraphemes: integerType.optional(),
-	minGraphemes: integerType.optional(),
-});
+export const stringSchema = v
+	.object({
+		type: v.literal('string'),
+		description: v.string().optional(),
+		format: v
+			.union(
+				v.literal('at-identifier'),
+				v.literal('at-uri'),
+				v.literal('cid'),
+				v.literal('datetime'),
+				v.literal('did'),
+				v.literal('handle'),
+				v.literal('language'),
+				v.literal('nsid'),
+				v.literal('record-key'),
+				v.literal('tid'),
+				v.literal('uri'),
+			)
+			.optional(),
+		default: v.string().optional(),
+		const: v.string().optional(),
+		enum: v.array(v.string()).optional(),
+		knownValues: v.array(v.string()).optional(),
+		maxLength: integerType.optional(),
+		minLength: integerType.optional(),
+		maxGraphemes: integerType.optional(),
+		minGraphemes: integerType.optional(),
+	})
+	.chain((obj) => {
+		const format = obj.format;
+		if (format !== undefined && format !== 'uri') {
+			if (obj.maxLength !== undefined) {
+				return v.err(`${format} format can't be used with maxLength`);
+			}
+			if (obj.minLength !== undefined) {
+				return v.err(`${format} format can't be used with minLength`);
+			}
+			if (obj.maxGraphemes !== undefined) {
+				return v.err(`${format} format can't be used with maxGraphemes`);
+			}
+			if (obj.minGraphemes !== undefined) {
+				return v.err(`${format} format can't be used with minGraphemes`);
+			}
+		}
+
+		return v.ok(obj);
+	});
 
 export type StringSchema = v.Infer<typeof stringSchema>;
 
@@ -121,7 +141,7 @@ export type BlobSchema = v.Infer<typeof blobSchema>;
 export const arraySchema = v.object({
 	type: v.literal('array'),
 	description: v.string().optional(),
-	items: v.union(primitiveSchema, ipldTypeSchema, blobSchema, blobSchema, refVariantSchema),
+	items: v.union(primitiveSchema, ipldTypeSchema, blobSchema, refVariantSchema),
 	maxLength: integerType.optional(),
 	minLength: integerType.optional(),
 });
