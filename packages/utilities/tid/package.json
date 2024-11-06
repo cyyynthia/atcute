@@ -1,7 +1,7 @@
 {
 	"type": "module",
 	"name": "@atcute/tid",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "create and parse TID identifiers",
 	"license": "MIT",
 	"repository": {
