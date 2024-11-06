@@ -5,7 +5,8 @@
 	"description": "create Bluesky threads containing multiple posts with one write",
 	"license": "MIT",
 	"repository": {
-		"url": "https://codeberg.org/mary-ext/atcute"
+		"url": "https://github.com/mary-ext/atcute",
+		"directory": "packages/bluesky/threading"
 	},
 	"files": [
 		"dist/",

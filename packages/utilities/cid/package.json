@@ -5,7 +5,8 @@
 	"description": "create and parse AT Protocol-blessed CIDv1 format",
 	"license": "MIT",
 	"repository": {
-		"url": "https://codeberg.org/mary-ext/atcute"
+		"url": "https://github.com/mary-ext/atcute",
+		"directory": "packages/utilities/cid"
 	},
 	"files": [
 		"dist/",

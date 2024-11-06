@@ -5,7 +5,8 @@
 	"description": "segments Bluesky's rich text facets into tokens",
 	"license": "MIT",
 	"repository": {
-		"url": "https://codeberg.org/mary-ext/atcute"
+		"url": "https://github.com/mary-ext/atcute",
+		"directory": "packages/bluesky/richtext-segmenter"
 	},
 	"files": [
 		"dist/",

@@ -5,7 +5,8 @@
 	"description": "Ozone type definitions for atcute",
 	"license": "MIT",
 	"repository": {
-		"url": "https://codeberg.org/mary-ext/atcute"
+		"url": "https://github.com/mary-ext/atcute",
+		"directory": "packages/definitions/ozone"
 	},
 	"files": [
 		"dist/",

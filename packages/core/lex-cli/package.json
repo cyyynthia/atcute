@@ -5,7 +5,8 @@
 	"description": "cli tool to generate type definitions for atcute",
 	"license": "MIT",
 	"repository": {
-		"url": "https://codeberg.org/mary-ext/atcute"
+		"url": "https://github.com/mary-ext/atcute",
+		"directory": "packages/core/lex-cli"
 	},
 	"files": [
 		"dist/",
