@@ -9,6 +9,9 @@
 	},
 	"files": [
 		"dist/",
+		"src/",
+		"!src/**/*.bench.ts",
+		"!src/**/*.test.ts",
 		"cli.mjs"
 	],
 	"bin": "./cli.mjs",

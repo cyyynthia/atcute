@@ -8,7 +8,10 @@
 		"url": "https://codeberg.org/mary-ext/atcute"
 	},
 	"files": [
-		"dist/"
+		"dist/",
+		"lib/",
+		"!lib/**/*.bench.ts",
+		"!lib/**/*.test.ts"
 	],
 	"exports": {
 		".": "./dist/index.js",
