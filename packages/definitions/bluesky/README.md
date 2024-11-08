@@ -57,7 +57,7 @@ const record: AppBskyFeedPost.Record = {
 ```
 
 ```ts
-const rpc = new XRPC({ handle: simpleFetchHandler({ service: 'https://api.bsky.app' }) });
+const rpc = new XRPC({ handler: simpleFetchHandler({ service: 'https://api.bsky.app' }) });
 
 const { data } = await rpc.get('app.bsky.actor.getProfile', {
 	params: {
