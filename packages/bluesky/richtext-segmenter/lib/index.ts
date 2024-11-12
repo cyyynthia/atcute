@@ -11,37 +11,6 @@ export interface RichtextSegment {
 	features: FacetFeature[] | undefined;
 }
 
-const getUtf8Size = (code: number): number => {
-	if (code <= 0x7f) {
-		return 1;
-	} else if (code <= 0x7ff) {
-		return 2;
-	} else if (code <= 0xffff) {
-		return 3;
-	} else {
-		return 4;
-	}
-};
-
-const getUtf8To16Mapping = (str: string): number[] => {
-	const map: number[] = [];
-	const len = str.length;
-
-	let u16pos = 0;
-
-	while (u16pos < len) {
-		const code = str.codePointAt(u16pos)!;
-
-		for (let i = getUtf8Size(code); i--; ) {
-			map.push(u16pos);
-		}
-
-		u16pos += code > 0xffff ? 2 : 1;
-	}
-
-	return map;
-};
-
 const segment = (text: string, features: FacetFeature[] | undefined): RichtextSegment => {
 	return { text: text, features: features };
 };
@@ -51,45 +20,53 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 		return [segment(text, undefined)];
 	}
 
-	const map = getUtf8To16Mapping(text);
-	const length = map.length;
-
 	const segments: RichtextSegment[] = [];
+	const textLength = text.length;
 
-	const facetsLength = facets.length;
+	let utf16Cursor = 0;
+	let utf8Cursor = 0;
 
-	let textCursor = 0;
-	let facetCursor = 0;
+	const advanceCursor = (startUtf16: number, endUtf8: number): number => {
+		let curs = startUtf16;
 
-	do {
-		const facet = facets[facetCursor];
+		while (utf8Cursor < endUtf8 && curs < textLength) {
+			const code = text.codePointAt(curs)!;
+
+			curs += code > 0xffff ? 2 : 1;
+			utf8Cursor += code <= 0x7f ? 1 : code <= 0x7ff ? 2 : code <= 0xffff ? 3 : 4;
+		}
+
+		return curs;
+	};
+
+	for (let idx = 0, len = facets.length; idx < len; idx++) {
+		const facet = facets[idx];
 		const { byteStart, byteEnd } = facet.index;
 
-		if (byteStart > byteEnd || textCursor > byteStart) {
-			facetCursor++;
-			continue;
-		} else if (textCursor < byteStart) {
-			const subtext = text.slice(map[textCursor], map[byteStart]);
-			segments.push(segment(subtext, undefined));
-		}
-
-		const subtext = text.slice(map[byteStart], map[byteEnd]);
 		const features = facet.features;
 
-		if (features.length === 0 || subtext.trim().length === 0) {
-			segments.push(segment(subtext, undefined));
-		} else {
-			segments.push(segment(subtext, features));
+		if (byteStart > byteEnd || features.length === 0) {
+			continue;
 		}
 
-		textCursor = byteEnd;
-		facetCursor++;
-	} while (facetCursor < facetsLength);
+		if (utf8Cursor < byteStart) {
+			const nextUtf16Cursor = advanceCursor(utf16Cursor, byteStart);
 
-	if (textCursor < length) {
-		const subtext = text.slice(map[textCursor]);
+			segments.push(segment(text.slice(utf16Cursor, nextUtf16Cursor), undefined));
+			utf16Cursor = nextUtf16Cursor;
+		}
 
-		segments.push(segment(subtext, undefined));
+		{
+			const nextCursor = advanceCursor(utf16Cursor, byteEnd);
+			const subtext = text.slice(utf16Cursor, nextCursor);
+
+			segments.push(segment(subtext, subtext.trim() ? features : undefined));
+			utf16Cursor = nextCursor;
+		}
+	}
+
+	if (utf16Cursor < textLength) {
+		segments.push(segment(text.slice(utf16Cursor), undefined));
 	}
 
 	return segments;
