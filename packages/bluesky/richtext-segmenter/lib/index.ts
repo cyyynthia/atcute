@@ -21,7 +21,7 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 	}
 
 	const segments: RichtextSegment[] = [];
-	const textLength = text.length;
+	const utf16Length = text.length;
 
 	let utf16Cursor = 0;
 	let utf8Cursor = 0;
@@ -29,7 +29,7 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 	const advanceCursor = (startUtf16: number, endUtf8: number): number => {
 		let curs = startUtf16;
 
-		while (utf8Cursor < endUtf8 && curs < textLength) {
+		while (utf8Cursor < endUtf8 && curs < utf16Length) {
 			const code = text.codePointAt(curs)!;
 
 			curs += code > 0xffff ? 2 : 1;
@@ -65,7 +65,7 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 		}
 	}
 
-	if (utf16Cursor < textLength) {
+	if (utf16Cursor < utf16Length) {
 		segments.push(segment(text.slice(utf16Cursor), undefined));
 	}
 
