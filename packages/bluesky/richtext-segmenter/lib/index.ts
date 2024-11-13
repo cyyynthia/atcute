@@ -57,11 +57,11 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 		}
 
 		{
-			const nextCursor = advanceCursor(utf16Cursor, byteEnd);
-			const subtext = text.slice(utf16Cursor, nextCursor);
+			const nextUtf16Cursor = advanceCursor(utf16Cursor, byteEnd);
+			const subtext = text.slice(utf16Cursor, nextUtf16Cursor);
 
 			segments.push(segment(subtext, subtext.trim() ? features : undefined));
-			utf16Cursor = nextCursor;
+			utf16Cursor = nextUtf16Cursor;
 		}
 	}
 
