@@ -47,6 +47,9 @@ importers:
       '@types/bun':
         specifier: ^1.1.12
         version: 1.1.12
+      mitata:
+        specifier: ^1.0.10
+        version: 1.0.10
 
   packages/bluesky/threading:
     dependencies:

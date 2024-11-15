@@ -16,7 +16,7 @@ const segment = (text: string, features: FacetFeature[] | undefined): RichtextSe
 };
 
 export const segmentize = (text: string, facets: Facet[] | undefined): RichtextSegment[] => {
-	if (!facets?.length) {
+	if (facets === undefined || facets.length === 0) {
 		return [segment(text, undefined)];
 	}
 
@@ -28,12 +28,13 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 	const advanceCursor = (startUtf16: number, endUtf8: number): number => {
 		let curs = startUtf16;
 
-		// Check if we should use multi-byte path
-		const firstChar = text.charCodeAt(curs);
-		const isMultiByte = firstChar >= 0x80;
+		// Fast-path for entirely ASCII text
+		const isLikelyAsciiText = text.charCodeAt(curs) < 0x80;
+		if (isLikelyAsciiText) {
+			curs += 1;
+			utf8Cursor += 1;
 
-		if (!isMultiByte) {
-			// SIMD-like batch processing for ASCII sections
+			// SIMD-like batch processing
 			while (utf8Cursor + 8 <= endUtf8 && curs + 8 <= utf16Length) {
 				const char1 = text.charCodeAt(curs);
 				const char2 = text.charCodeAt(curs + 1);
@@ -44,12 +45,12 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 				const char7 = text.charCodeAt(curs + 6);
 				const char8 = text.charCodeAt(curs + 7);
 
-				// Fast ASCII check using bitwise OR
 				if ((char1 | char2 | char3 | char4 | char5 | char6 | char7 | char8) < 0x80) {
 					curs += 8;
 					utf8Cursor += 8;
 					continue;
 				}
+
 				break;
 			}
 		}
@@ -60,17 +61,13 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 
 			// Fast ASCII path
 			if (code < 0x80) {
-				curs++;
-				utf8Cursor++;
-				continue;
-			}
-
-			// Multi-byte path - unified handling
-			if (code < 0x800) {
-				curs++;
+				curs += 1;
+				utf8Cursor += 1;
+			} else if (code < 0x800) {
+				curs += 1;
 				utf8Cursor += 2;
 			} else if (code < 0xd800 || code > 0xdbff) {
-				curs++;
+				curs += 1;
 				utf8Cursor += 3;
 			} else {
 				curs += 2;
@@ -81,31 +78,34 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 		return curs;
 	};
 
-	// Pre-filter valid facets
-	const validFacets = facets.filter((facet) => {
-		const byteStart = facet.index.byteStart;
-		const byteEnd = facet.index.byteEnd;
-		return byteEnd > byteStart && facet.features.length > 0;
-	});
-
 	// Process facets
-	for (const facet of validFacets) {
+	for (let idx = 0, len = facets.length; idx < len; idx++) {
+		const facet = facets[idx];
+
 		const { byteStart, byteEnd } = facet.index;
-		const { features } = facet;
+		const features = facet.features;
+
+		if (byteStart > byteEnd || features.length === 0) {
+			continue;
+		}
 
 		if (utf8Cursor < byteStart) {
 			const nextUtf16Cursor = advanceCursor(utf16Cursor, byteStart);
 			if (nextUtf16Cursor > utf16Cursor) {
 				segments.push(segment(text.slice(utf16Cursor, nextUtf16Cursor), undefined));
 			}
+
 			utf16Cursor = nextUtf16Cursor;
 		}
 
-		const nextUtf16Cursor = advanceCursor(utf16Cursor, byteEnd);
-		if (nextUtf16Cursor > utf16Cursor) {
-			segments.push(segment(text.slice(utf16Cursor, nextUtf16Cursor), features));
+		{
+			const nextUtf16Cursor = advanceCursor(utf16Cursor, byteEnd);
+			if (nextUtf16Cursor > utf16Cursor) {
+				segments.push(segment(text.slice(utf16Cursor, nextUtf16Cursor), features));
+			}
+
+			utf16Cursor = nextUtf16Cursor;
 		}
-		utf16Cursor = nextUtf16Cursor;
 	}
 
 	// Handle remaining text
