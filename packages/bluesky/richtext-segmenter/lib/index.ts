@@ -59,7 +59,6 @@ export const segmentize = (text: string, facets: Facet[] | undefined): RichtextS
 		while (utf8Cursor < endUtf8 && curs < utf16Length) {
 			const code = text.charCodeAt(curs);
 
-			// Fast ASCII path
 			if (code < 0x80) {
 				curs += 1;
 				utf8Cursor += 1;
