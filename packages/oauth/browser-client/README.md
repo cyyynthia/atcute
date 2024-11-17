@@ -7,9 +7,9 @@ minimal OAuth browser client implementation for AT Protocol.
 - **does not use IndexedDB**: makes the library work under Safari's lockdown mode, and has less
   maintenance headache overall, but it also means this is "less secure" (it won't be able to use
   non-exportable keys as recommended by [DPoP specification][idb-dpop-spec].)
-- **not well-tested**: it has been used in personal projects for quite some time, but hasn't seen
-  any use outside of that. using the [reference implementation][oauth-atproto-lib] is recommended if
-  you are unsure about the implications presented here.
+- **not well-tested**: it has been used in personal projects and by friends for quite some time, but
+  hasn't seen any use outside of that. using the [reference implementation][oauth-atproto-lib] is
+  recommended if you are unsure about the implications presented here.
 
 [idb-dpop-spec]: https://datatracker.ietf.org/doc/html/rfc9449#section-2-4
 [oauth-atproto-lib]: https://npm.im/@atproto/oauth-client-browser
@@ -118,7 +118,20 @@ const session = await finalizeAuthorization(params);
 const agent = new OAuthUserAgent(session);
 
 // pass it onto the XRPC so you can make RPC calls with the PDS.
-const rpc = new XRPC({ handler: agent });
+{
+	const rpc = new XRPC({ handler: agent });
+
+	const { data } = await rpc.get('com.atproto.identity.resolveHandle', {
+		params: {
+			handle: 'mary.my.id',
+		},
+	});
+}
+
+// or, use it directly!
+{
+	const response = await agent.handle('/xrpc/com.atproto.identity.resolveHandle?handle=mary.my.id');
+}
 ```
 
 the `session` object returned by `finalizeAuthorization` should not be stored anywhere else, as it
