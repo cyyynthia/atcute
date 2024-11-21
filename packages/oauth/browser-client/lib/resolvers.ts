@@ -6,7 +6,7 @@ import { ResolverError } from './errors.js';
 import type { IdentityMetadata } from './types/identity.js';
 import type { AuthorizationServerMetadata, ProtectedResourceMetadata } from './types/server.js';
 import { extractContentType } from './utils/response.js';
-import { isDid } from './utils/strings.js';
+import { isDid, isValidUrl } from './utils/strings.js';
 
 const DID_WEB_RE = /^([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*(?:\.[a-zA-Z]{2,}))$/;
 
@@ -124,6 +124,9 @@ export const getAuthorizationServerMetadata = async (host: string): Promise<Auth
 	const metadata = (await response.json()) as AuthorizationServerMetadata;
 	if (metadata.issuer !== url.origin) {
 		throw new ResolverError(`unexpected issuer`);
+	}
+	if (!isValidUrl(metadata.authorization_endpoint)) {
+		throw new ResolverError(`authorization server provided incorrect authorization endpoint`);
 	}
 	if (!metadata.client_id_metadata_document_supported) {
 		throw new ResolverError(`authorization server does not support 'client_id_metadata_document'`);
