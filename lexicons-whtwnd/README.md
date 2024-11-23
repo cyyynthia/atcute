@@ -1,1 +1,1 @@
-https://github.com/whtwnd/whitewind-blog/tree/c5bbe235a8500c3d9369c0a25e6eb8270882461c/lexicons
+https://github.com/whtwnd/whitewind-blog/tree/58928d674fd5a1ad98ff0ef5e5137ccbfd525a9f/lexicons
