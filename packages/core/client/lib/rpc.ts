@@ -32,8 +32,16 @@ export class XRPCError extends Error {
 	/** Error description */
 	description?: string;
 
-	constructor(status: number, { kind, description, headers, cause }: XRPCErrorOptions = {}) {
-		super(`${kind || 'UnspecifiedKind'} > ${description || `Unspecified error description`}`, { cause });
+	constructor(
+		status: number,
+		{
+			kind = `HTTP error ${status}`,
+			description = `Unspecified error description`,
+			headers,
+			cause,
+		}: XRPCErrorOptions = {},
+	) {
+		super(`${kind} > ${description}`, { cause });
 
 		this.status = status;
 		this.kind = kind;
