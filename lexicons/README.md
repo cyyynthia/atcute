@@ -1,1 +1,1 @@
-https://github.com/bluesky-social/atproto/tree/22d039a229e3ef08a793e1c98b473b1b8e18ac5e/lexicons
+https://github.com/bluesky-social/atproto/tree/a3ce23c4ccf4f40998b9d1f5731e5c905390aedc/lexicons

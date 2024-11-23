@@ -257,7 +257,7 @@ declare module '@atcute/client/lexicons' {
 			/** Show followed users at the top of all replies. */
 			prioritizeFollowedUsers?: boolean;
 			/** Sorting mode for threads. */
-			sort?: 'most-likes' | 'newest' | 'oldest' | 'random' | (string & {});
+			sort?: 'hotness' | 'most-likes' | 'newest' | 'oldest' | 'random' | (string & {});
 		}
 		/** Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests. */
 		interface ViewerState {
@@ -1777,6 +1777,26 @@ declare module '@atcute/client/lexicons' {
 		type Output = undefined;
 	}
 
+	/** Find starter packs matching search criteria. Does not require auth. */
+	namespace AppBskyGraphSearchStarterPacks {
+		interface Params {
+			/** Search query string. Syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended. */
+			q: string;
+			cursor?: string;
+			/**
+			 * Minimum: 1 \
+			 * Maximum: 100
+			 * @default 25
+			 */
+			limit?: number;
+		}
+		type Input = undefined;
+		interface Output {
+			starterPacks: AppBskyGraphDefs.StarterPackViewBasic[];
+			cursor?: string;
+		}
+	}
+
 	namespace AppBskyGraphStarterpack {
 		/** Record defining a starter pack of actors and feeds for new users. */
 		interface Record {
@@ -2023,6 +2043,19 @@ declare module '@atcute/client/lexicons' {
 			[Brand.Type]?: 'app.bsky.unspecced.defs#skeletonSearchPost';
 			uri: At.Uri;
 		}
+		interface SkeletonSearchStarterPack {
+			[Brand.Type]?: 'app.bsky.unspecced.defs#skeletonSearchStarterPack';
+			uri: At.Uri;
+		}
+	}
+
+	/** Get miscellaneous runtime configuration. */
+	namespace AppBskyUnspeccedGetConfig {
+		interface Params {}
+		type Input = undefined;
+		interface Output {
+			checkEmailConfirmed?: boolean;
+		}
 	}
 
 	/** An unspecced view of globally popular feed generators. */
@@ -2165,6 +2198,34 @@ declare module '@atcute/client/lexicons' {
 		}
 	}
 
+	/** Backend Starter Pack search, returns only skeleton. */
+	namespace AppBskyUnspeccedSearchStarterPacksSkeleton {
+		interface Params {
+			/** Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended. */
+			q: string;
+			/** Optional pagination mechanism; may not necessarily allow scrolling through entire result set. */
+			cursor?: string;
+			/**
+			 * Minimum: 1 \
+			 * Maximum: 100
+			 * @default 25
+			 */
+			limit?: number;
+			/** DID of the account making the request (not included for public/unauthenticated queries). */
+			viewer?: At.DID;
+		}
+		type Input = undefined;
+		interface Output {
+			starterPacks: AppBskyUnspeccedDefs.SkeletonSearchStarterPack[];
+			cursor?: string;
+			/** Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits. */
+			hitsTotal?: number;
+		}
+		interface Errors {
+			BadQueryString: {};
+		}
+	}
+
 	namespace AppBskyVideoDefs {
 		interface JobStatus {
 			[Brand.Type]?: 'app.bsky.video.defs#jobStatus';
@@ -2265,6 +2326,7 @@ declare module '@atcute/client/lexicons' {
 			rev: string;
 			unreadCount: number;
 			lastMessage?: Brand.Union<DeletedMessageView | MessageView>;
+			opened?: boolean;
 		}
 		interface DeletedMessageView {
 			[Brand.Type]?: 'chat.bsky.convo.defs#deletedMessageView';
@@ -2694,6 +2756,10 @@ declare module '@atcute/client/lexicons' {
 			params: AppBskyGraphGetSuggestedFollowsByActor.Params;
 			output: AppBskyGraphGetSuggestedFollowsByActor.Output;
 		};
+		'app.bsky.graph.searchStarterPacks': {
+			params: AppBskyGraphSearchStarterPacks.Params;
+			output: AppBskyGraphSearchStarterPacks.Output;
+		};
 		'app.bsky.labeler.getServices': {
 			params: AppBskyLabelerGetServices.Params;
 			output: AppBskyLabelerGetServices.Output;
@@ -2705,6 +2771,9 @@ declare module '@atcute/client/lexicons' {
 		'app.bsky.notification.listNotifications': {
 			params: AppBskyNotificationListNotifications.Params;
 			output: AppBskyNotificationListNotifications.Output;
+		};
+		'app.bsky.unspecced.getConfig': {
+			output: AppBskyUnspeccedGetConfig.Output;
 		};
 		'app.bsky.unspecced.getPopularFeedGenerators': {
 			params: AppBskyUnspeccedGetPopularFeedGenerators.Params;
@@ -2724,6 +2793,10 @@ declare module '@atcute/client/lexicons' {
 		'app.bsky.unspecced.searchPostsSkeleton': {
 			params: AppBskyUnspeccedSearchPostsSkeleton.Params;
 			output: AppBskyUnspeccedSearchPostsSkeleton.Output;
+		};
+		'app.bsky.unspecced.searchStarterPacksSkeleton': {
+			params: AppBskyUnspeccedSearchStarterPacksSkeleton.Params;
+			output: AppBskyUnspeccedSearchStarterPacksSkeleton.Output;
 		};
 		'app.bsky.video.getJobStatus': {
 			params: AppBskyVideoGetJobStatus.Params;

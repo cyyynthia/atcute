@@ -94,6 +94,31 @@ declare module '@atcute/client/lexicons' {
 	}
 
 	namespace ToolsOzoneModerationDefs {
+		/** Logs account status related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking. */
+		interface AccountEvent {
+			[Brand.Type]?: 'tools.ozone.moderation.defs#accountEvent';
+			/** Indicates that the account has a repository which can be fetched from the host that emitted this event. */
+			active: boolean;
+			timestamp: string;
+			comment?: string;
+			status?:
+				| 'deactivated'
+				| 'deleted'
+				| 'suspended'
+				| 'takendown'
+				| 'tombstoned'
+				| 'unknown'
+				| (string & {});
+		}
+		interface AccountHosting {
+			[Brand.Type]?: 'tools.ozone.moderation.defs#accountHosting';
+			status: 'deactivated' | 'deleted' | 'suspended' | 'takendown' | 'unknown' | (string & {});
+			createdAt?: string;
+			deactivatedAt?: string;
+			deletedAt?: string;
+			reactivatedAt?: string;
+			updatedAt?: string;
+		}
 		interface BlobView {
 			[Brand.Type]?: 'tools.ozone.moderation.defs#blobView';
 			cid: At.CID;
@@ -102,6 +127,15 @@ declare module '@atcute/client/lexicons' {
 			size: number;
 			details?: Brand.Union<ImageDetails | VideoDetails>;
 			moderation?: Moderation;
+		}
+		/** Logs identity related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking. */
+		interface IdentityEvent {
+			[Brand.Type]?: 'tools.ozone.moderation.defs#identityEvent';
+			timestamp: string;
+			comment?: string;
+			handle?: At.Handle;
+			pdsHost?: string;
+			tombstone?: boolean;
 		}
 		interface ImageDetails {
 			[Brand.Type]?: 'tools.ozone.moderation.defs#imageDetails';
@@ -163,9 +197,9 @@ declare module '@atcute/client/lexicons' {
 		/** Mute incoming reports from an account */
 		interface ModEventMuteReporter {
 			[Brand.Type]?: 'tools.ozone.moderation.defs#modEventMuteReporter';
-			/** Indicates how long the account should remain muted. */
-			durationInHours: number;
 			comment?: string;
+			/** Indicates how long the account should remain muted. Falsy value here means a permanent mute. */
+			durationInHours?: number;
 		}
 		/** Report a subject */
 		interface ModEventReport {
@@ -223,6 +257,8 @@ declare module '@atcute/client/lexicons' {
 			createdAt: string;
 			createdBy: At.DID;
 			event: Brand.Union<
+				| AccountEvent
+				| IdentityEvent
 				| ModEventAcknowledge
 				| ModEventComment
 				| ModEventDivert
@@ -238,6 +274,7 @@ declare module '@atcute/client/lexicons' {
 				| ModEventTakedown
 				| ModEventUnmute
 				| ModEventUnmuteReporter
+				| RecordEvent
 			>;
 			id: number;
 			subject: Brand.Union<
@@ -252,6 +289,8 @@ declare module '@atcute/client/lexicons' {
 			createdAt: string;
 			createdBy: At.DID;
 			event: Brand.Union<
+				| AccountEvent
+				| IdentityEvent
 				| ModEventAcknowledge
 				| ModEventComment
 				| ModEventDivert
@@ -267,10 +306,26 @@ declare module '@atcute/client/lexicons' {
 				| ModEventTakedown
 				| ModEventUnmute
 				| ModEventUnmuteReporter
+				| RecordEvent
 			>;
 			id: number;
 			subject: Brand.Union<RecordView | RecordViewNotFound | RepoView | RepoViewNotFound>;
 			subjectBlobs: BlobView[];
+		}
+		/** Logs lifecycle event on a record subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking. */
+		interface RecordEvent {
+			[Brand.Type]?: 'tools.ozone.moderation.defs#recordEvent';
+			op: 'create' | 'delete' | 'update' | (string & {});
+			timestamp: string;
+			cid?: At.CID;
+			comment?: string;
+		}
+		interface RecordHosting {
+			[Brand.Type]?: 'tools.ozone.moderation.defs#recordHosting';
+			status: 'deleted' | 'unknown' | (string & {});
+			createdAt?: string;
+			deletedAt?: string;
+			updatedAt?: string;
 		}
 		interface RecordView {
 			[Brand.Type]?: 'tools.ozone.moderation.defs#recordView';
@@ -309,6 +364,7 @@ declare module '@atcute/client/lexicons' {
 			invitedBy?: ComAtprotoServerDefs.InviteCode;
 			inviteNote?: string;
 			invitesDisabled?: boolean;
+			threatSignatures?: ComAtprotoAdminDefs.ThreatSignature[];
 		}
 		interface RepoViewDetail {
 			[Brand.Type]?: 'tools.ozone.moderation.defs#repoViewDetail';
@@ -325,6 +381,7 @@ declare module '@atcute/client/lexicons' {
 			invites?: ComAtprotoServerDefs.InviteCode[];
 			invitesDisabled?: boolean;
 			labels?: ComAtprotoLabelDefs.Label[];
+			threatSignatures?: ComAtprotoAdminDefs.ThreatSignature[];
 		}
 		interface RepoViewNotFound {
 			[Brand.Type]?: 'tools.ozone.moderation.defs#repoViewNotFound';
@@ -353,6 +410,7 @@ declare module '@atcute/client/lexicons' {
 			appealed?: boolean;
 			/** Sticky comment on the subject. */
 			comment?: string;
+			hosting?: Brand.Union<AccountHosting | RecordHosting>;
 			/** Timestamp referencing when the author of the subject appealed a moderation action */
 			lastAppealedAt?: string;
 			lastReportedAt?: string;
@@ -380,6 +438,8 @@ declare module '@atcute/client/lexicons' {
 		interface Input {
 			createdBy: At.DID;
 			event: Brand.Union<
+				| ToolsOzoneModerationDefs.AccountEvent
+				| ToolsOzoneModerationDefs.IdentityEvent
 				| ToolsOzoneModerationDefs.ModEventAcknowledge
 				| ToolsOzoneModerationDefs.ModEventComment
 				| ToolsOzoneModerationDefs.ModEventEmail
@@ -394,6 +454,7 @@ declare module '@atcute/client/lexicons' {
 				| ToolsOzoneModerationDefs.ModEventTakedown
 				| ToolsOzoneModerationDefs.ModEventUnmute
 				| ToolsOzoneModerationDefs.ModEventUnmuteReporter
+				| ToolsOzoneModerationDefs.RecordEvent
 			>;
 			subject: Brand.Union<ComAtprotoAdminDefs.RepoRef | ComAtprotoRepoStrongRef.Main>;
 			subjectBlobCids?: At.CID[];
@@ -473,6 +534,11 @@ declare module '@atcute/client/lexicons' {
 			addedLabels?: string[];
 			/** If specified, only events where all of these tags were added are returned */
 			addedTags?: string[];
+			/**
+			 * If specified, only events where the subject belongs to the given collections will be returned. When subjectType is set to 'account', this will be ignored. \
+			 * Maximum array length: 20
+			 */
+			collections?: string[];
 			/** If specified, only events with comments containing the keyword are returned */
 			comment?: string;
 			/** Retrieve events created after a given timestamp */
@@ -484,7 +550,7 @@ declare module '@atcute/client/lexicons' {
 			/** If true, only events with comments are returned */
 			hasComment?: boolean;
 			/**
-			 * If true, events on all record types (posts, lists, profile etc.) owned by the did are returned
+			 * If true, events on all record types (posts, lists, profile etc.) or records from given 'collections' param, owned by the did are returned.
 			 * @default false
 			 */
 			includeAllUserRecords?: boolean;
@@ -505,6 +571,8 @@ declare module '@atcute/client/lexicons' {
 			 */
 			sortDirection?: 'asc' | 'desc';
 			subject?: string;
+			/** If specified, only events where the subject is of the given type (account or record) will be returned. When this is set to 'account' the 'collections' parameter will be ignored. When includeAllUserRecords or subject is set, this will be ignored. */
+			subjectType?: 'account' | 'record' | (string & {});
 			/** The types of events (fully qualified string in the format of tools.ozone.moderation.defs#modEvent<name>) to filter by. If not specified, all events are returned. */
 			types?: string[];
 		}
@@ -520,12 +588,27 @@ declare module '@atcute/client/lexicons' {
 		interface Params {
 			/** Get subjects in unresolved appealed status */
 			appealed?: boolean;
+			/**
+			 * If specified, subjects belonging to the given collections will be returned. When subjectType is set to 'account', this will be ignored. \
+			 * Maximum array length: 20
+			 */
+			collections?: string[];
 			/** Search subjects by keyword from comments */
 			comment?: string;
 			cursor?: string;
 			excludeTags?: string[];
+			/** Search subjects where the associated record/account was deleted after a given timestamp */
+			hostingDeletedAfter?: string;
+			/** Search subjects where the associated record/account was deleted before a given timestamp */
+			hostingDeletedBefore?: string;
+			/** Search subjects by the status of the associated record/account */
+			hostingStatuses?: string[];
+			/** Search subjects where the associated record/account was updated after a given timestamp */
+			hostingUpdatedAfter?: string;
+			/** Search subjects where the associated record/account was updated before a given timestamp */
+			hostingUpdatedBefore?: string;
 			ignoreSubjects?: string[];
-			/** All subjects belonging to the account specified in the 'subject' param will be returned. */
+			/** All subjects, or subjects from given 'collections' param, belonging to the account specified in the 'subject' param will be returned. */
 			includeAllUserRecords?: boolean;
 			/** By default, we don't include muted subjects in the results. Set this to true to include them. */
 			includeMuted?: boolean;
@@ -555,6 +638,8 @@ declare module '@atcute/client/lexicons' {
 			sortField?: 'lastReviewedAt' | 'lastReportedAt';
 			/** The subject to get the status for. */
 			subject?: string;
+			/** If specified, subjects of the given type (account or record) will be returned. When this is set to 'account' the 'collections' parameter will be ignored. When includeAllUserRecords or subject is set, this will be ignored. */
+			subjectType?: 'account' | 'record' | (string & {});
 			tags?: string[];
 			/** Get subjects that were taken down */
 			takendown?: boolean;
@@ -750,6 +835,91 @@ declare module '@atcute/client/lexicons' {
 		type Output = ToolsOzoneSetDefs.SetView;
 	}
 
+	namespace ToolsOzoneSettingDefs {
+		interface Option {
+			[Brand.Type]?: 'tools.ozone.setting.defs#option';
+			createdBy: At.DID;
+			did: At.DID;
+			key: string;
+			lastUpdatedBy: At.DID;
+			scope: 'instance' | 'personal' | (string & {});
+			value: unknown;
+			createdAt?: string;
+			/**
+			 * Maximum string length: 10240 \
+			 * Maximum grapheme length: 1024
+			 */
+			description?: string;
+			managerRole?:
+				| 'tools.ozone.team.defs#roleAdmin'
+				| 'tools.ozone.team.defs#roleModerator'
+				| 'tools.ozone.team.defs#roleTriage'
+				| (string & {});
+			updatedAt?: string;
+		}
+	}
+
+	/** List settings with optional filtering */
+	namespace ToolsOzoneSettingListOptions {
+		interface Params {
+			cursor?: string;
+			/**
+			 * Filter for only the specified keys. Ignored if prefix is provided \
+			 * Maximum array length: 100
+			 */
+			keys?: string[];
+			/**
+			 * Minimum: 1 \
+			 * Maximum: 100
+			 * @default 50
+			 */
+			limit?: number;
+			/** Filter keys by prefix */
+			prefix?: string;
+			/** @default "instance" */
+			scope?: 'instance' | 'personal' | (string & {});
+		}
+		type Input = undefined;
+		interface Output {
+			options: ToolsOzoneSettingDefs.Option[];
+			cursor?: string;
+		}
+	}
+
+	/** Delete settings by key */
+	namespace ToolsOzoneSettingRemoveOptions {
+		interface Params {}
+		interface Input {
+			/**
+			 * Minimum array length: 1 \
+			 * Maximum array length: 200
+			 */
+			keys: string[];
+			scope: 'instance' | 'personal' | (string & {});
+		}
+		interface Output {}
+	}
+
+	/** Create or update setting option */
+	namespace ToolsOzoneSettingUpsertOption {
+		interface Params {}
+		interface Input {
+			key: string;
+			scope: 'instance' | 'personal' | (string & {});
+			value: unknown;
+			/** Maximum string length: 2000 */
+			description?: string;
+			managerRole?:
+				| 'tools.ozone.team.defs#roleAdmin'
+				| 'tools.ozone.team.defs#roleModerator'
+				| 'tools.ozone.team.defs#roleTriage'
+				| (string & {});
+		}
+		interface Output {
+			option: ToolsOzoneSettingDefs.Option;
+		}
+	}
+
 	namespace ToolsOzoneSignatureDefs {
 		interface SigDetail {
 			[Brand.Type]?: 'tools.ozone.signature.defs#sigDetail';
@@ -943,6 +1113,10 @@ declare module '@atcute/client/lexicons' {
 			params: ToolsOzoneSetQuerySets.Params;
 			output: ToolsOzoneSetQuerySets.Output;
 		};
+		'tools.ozone.setting.listOptions': {
+			params: ToolsOzoneSettingListOptions.Params;
+			output: ToolsOzoneSettingListOptions.Output;
+		};
 		'tools.ozone.signature.findCorrelation': {
 			params: ToolsOzoneSignatureFindCorrelation.Params;
 			output: ToolsOzoneSignatureFindCorrelation.Output;
@@ -990,6 +1164,14 @@ declare module '@atcute/client/lexicons' {
 		'tools.ozone.set.upsertSet': {
 			input: ToolsOzoneSetUpsertSet.Input;
 			output: ToolsOzoneSetUpsertSet.Output;
+		};
+		'tools.ozone.setting.removeOptions': {
+			input: ToolsOzoneSettingRemoveOptions.Input;
+			output: ToolsOzoneSettingRemoveOptions.Output;
+		};
+		'tools.ozone.setting.upsertOption': {
+			input: ToolsOzoneSettingUpsertOption.Input;
+			output: ToolsOzoneSettingUpsertOption.Output;
 		};
 		'tools.ozone.team.addMember': {
 			input: ToolsOzoneTeamAddMember.Input;

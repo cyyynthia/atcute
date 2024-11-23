@@ -71,6 +71,7 @@ export declare namespace ComAtprotoAdminDefs {
 		invites?: ComAtprotoServerDefs.InviteCode[];
 		invitesDisabled?: boolean;
 		relatedRecords?: unknown[];
+		threatSignatures?: ThreatSignature[];
 	}
 	interface RepoBlobRef {
 		[Brand.Type]?: 'com.atproto.admin.defs#repoBlobRef';
@@ -86,6 +87,11 @@ export declare namespace ComAtprotoAdminDefs {
 		[Brand.Type]?: 'com.atproto.admin.defs#statusAttr';
 		applied: boolean;
 		ref?: string;
+	}
+	interface ThreatSignature {
+		[Brand.Type]?: 'com.atproto.admin.defs#threatSignature';
+		property: string;
+		value: string;
 	}
 }
 
@@ -541,7 +547,7 @@ export declare namespace ComAtprotoRepoApplyWrites {
 		[Brand.Type]?: 'com.atproto.repo.applyWrites#create';
 		collection: string;
 		value: unknown;
-		/** Maximum string length: 15 */
+		/** Maximum string length: 512 */
 		rkey?: string;
 	}
 	interface CreateResult {
@@ -586,7 +592,7 @@ export declare namespace ComAtprotoRepoCreateRecord {
 		repo: string;
 		/**
 		 * The Record Key. \
-		 * Maximum string length: 15
+		 * Maximum string length: 512
 		 */
 		rkey?: string;
 		/** Compare and swap with the previous commit by CID. */
@@ -761,7 +767,7 @@ export declare namespace ComAtprotoRepoPutRecord {
 		repo: string;
 		/**
 		 * The Record Key. \
-		 * Maximum string length: 15
+		 * Maximum string length: 512
 		 */
 		rkey: string;
 		/** Compare and swap with the previous commit by CID. */
@@ -1547,6 +1553,15 @@ export declare namespace ComAtprotoSyncSubscribeRepos {
 	}
 }
 
+/** Add a handle to the set of reserved handles. */
+export declare namespace ComAtprotoTempAddReservedHandle {
+	interface Params {}
+	interface Input {
+		handle: string;
+	}
+	interface Output {}
+}
+
 /** Check accounts location in signup queue. */
 export declare namespace ComAtprotoTempCheckSignupQueue {
 	interface Params {}
@@ -1834,6 +1849,10 @@ export declare interface Procedures {
 	};
 	'com.atproto.sync.requestCrawl': {
 		input: ComAtprotoSyncRequestCrawl.Input;
+	};
+	'com.atproto.temp.addReservedHandle': {
+		input: ComAtprotoTempAddReservedHandle.Input;
+		output: ComAtprotoTempAddReservedHandle.Output;
 	};
 	'com.atproto.temp.requestPhoneVerification': {
 		input: ComAtprotoTempRequestPhoneVerification.Input;
