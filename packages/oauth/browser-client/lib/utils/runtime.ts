@@ -1,6 +1,6 @@
 export const encoder = new TextEncoder();
 
-export const locks = navigator.locks as LockManager | undefined;
+export const locks: LockManager | undefined = typeof navigator !== 'undefined' ? navigator.locks : undefined;
 
 export const toBase64Url = (input: Uint8Array): string => {
 	const CHUNK_SIZE = 0x8000;
