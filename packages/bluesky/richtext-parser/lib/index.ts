@@ -159,37 +159,15 @@ export const tokenize = (src: string): Token[] => {
 	while (src) {
 		lastToken = token;
 
-		if ((token = tokenizeEscape(src))) {
-			src = src.slice(token.raw.length);
-			tokens.push(token);
-			continue;
-		}
-
-		if ((token = tokenizeAutolink(src))) {
-			src = src.slice(token.raw.length);
-			tokens.push(token);
-			continue;
-		}
-
-		if ((token = tokenizeMention(src))) {
-			src = src.slice(token.raw.length);
-			tokens.push(token);
-			continue;
-		}
-
-		if ((token = tokenizeTopic(src))) {
-			src = src.slice(token.raw.length);
-			tokens.push(token);
-			continue;
-		}
-
-		if ((token = tokenizeEmote(src))) {
-			src = src.slice(token.raw.length);
-			tokens.push(token);
-			continue;
-		}
-
-		if ((token = tokenizeLink(src))) {
+		if (
+			(token =
+				tokenizeEscape(src) ||
+				tokenizeAutolink(src) ||
+				tokenizeMention(src) ||
+				tokenizeTopic(src) ||
+				tokenizeEmote(src) ||
+				tokenizeLink(src))
+		) {
 			src = src.slice(token.raw.length);
 			tokens.push(token);
 			continue;
