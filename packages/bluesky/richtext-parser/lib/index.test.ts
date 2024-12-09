@@ -462,26 +462,26 @@ it('autolinks', () => {
 	expect(tokenize('https://example.com/.)')).toEqual([
 		{
 			type: 'autolink',
-			raw: 'https://example.com/',
-			url: 'https://example.com/',
+			raw: 'https://example.com/.',
+			url: 'https://example.com/.',
 		},
 		{
 			type: 'text',
-			raw: '.)',
-			text: '.)',
+			raw: ')',
+			text: ')',
 		},
 	]);
 
 	expect(tokenize('https://example.com/.))')).toEqual([
 		{
 			type: 'autolink',
-			raw: 'https://example.com/',
-			url: 'https://example.com/',
+			raw: 'https://example.com/.)',
+			url: 'https://example.com/.)',
 		},
 		{
 			type: 'text',
-			raw: '.))',
-			text: '.))',
+			raw: ')',
+			text: ')',
 		},
 	]);
 

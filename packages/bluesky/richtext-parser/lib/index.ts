@@ -5,8 +5,8 @@ const TOPIC_RE =
 
 const EMOTE_RE = /^:([\w-]+):/;
 
-const AUTOLINK_RE = /^https?:\/\/(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*/;
-const AUTOLINK_BACKPEDAL_RE = /(?:[^?!.,:;*_'"~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_'"~)]+(?!$))+/;
+const AUTOLINK_RE = /^https?:\/\/[\S]+/;
+const AUTOLINK_BACKPEDAL_RE = /(?:(?<!\(.*)\))?[.,;]*$/;
 
 const LINK_RE = /^\[((?:\[(?:\\.|[^\[\]\\])*\]|\\.|[^\[\]\\])*?)\]\((.*?)\)/;
 
@@ -106,13 +106,7 @@ const tokenizeEmote = (src: string): EmoteToken | undefined => {
 const tokenizeAutolink = (src: string): AutolinkToken | undefined => {
 	const match = AUTOLINK_RE.exec(src);
 	if (match) {
-		let url = match[0];
-		let prevUrl: string;
-
-		do {
-			prevUrl = url;
-			url = AUTOLINK_BACKPEDAL_RE.exec(url)?.[0] ?? '';
-		} while (prevUrl !== url);
+		const url = match[0].replace(AUTOLINK_BACKPEDAL_RE, '');
 
 		return {
 			type: 'autolink',
