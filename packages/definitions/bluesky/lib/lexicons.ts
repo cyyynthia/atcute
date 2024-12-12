@@ -1936,6 +1936,11 @@ declare module '@atcute/client/lexicons' {
 			 */
 			limit?: number;
 			priority?: boolean;
+			/**
+			 * Notification reasons to include in response. \
+			 * A reason that matches the reason property of #notification.
+			 */
+			reasons?: string[];
 			seenAt?: string;
 		}
 		type Input = undefined;

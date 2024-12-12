@@ -152,6 +152,8 @@ declare module '@atcute/client/lexicons' {
 		}
 		interface ModEventAcknowledge {
 			[Brand.Type]?: 'tools.ozone.moderation.defs#modEventAcknowledge';
+			/** If true, all other reports on content authored by this account will be resolved (acknowledged). */
+			acknowledgeAccountSubjects?: boolean;
 			comment?: string;
 		}
 		/** Add a comment to a subject */
@@ -539,7 +541,7 @@ declare module '@atcute/client/lexicons' {
 			 * Maximum array length: 20
 			 */
 			collections?: string[];
-			/** If specified, only events with comments containing the keyword are returned */
+			/** If specified, only events with comments containing the keyword are returned. Apply || separator to use multiple keywords and match using OR condition. */
 			comment?: string;
 			/** Retrieve events created after a given timestamp */
 			createdAfter?: string;
