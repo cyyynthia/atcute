@@ -2052,6 +2052,13 @@ declare module '@atcute/client/lexicons' {
 			[Brand.Type]?: 'app.bsky.unspecced.defs#skeletonSearchStarterPack';
 			uri: At.Uri;
 		}
+		interface TrendingTopic {
+			[Brand.Type]?: 'app.bsky.unspecced.defs#trendingTopic';
+			link: string;
+			topic: string;
+			description?: string;
+			displayName?: string;
+		}
 	}
 
 	/** Get miscellaneous runtime configuration. */
@@ -2117,6 +2124,25 @@ declare module '@atcute/client/lexicons' {
 			subject: string;
 			subjectType: 'actor' | 'feed' | (string & {});
 			tag: string;
+		}
+	}
+
+	/** Get a list of trending topics */
+	namespace AppBskyUnspeccedGetTrendingTopics {
+		interface Params {
+			/**
+			 * Minimum: 1 \
+			 * Maximum: 25
+			 * @default 10
+			 */
+			limit?: number;
+			/** DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed accounts in ranking. */
+			viewer?: At.DID;
+		}
+		type Input = undefined;
+		interface Output {
+			suggested: AppBskyUnspeccedDefs.TrendingTopic[];
+			topics: AppBskyUnspeccedDefs.TrendingTopic[];
 		}
 	}
 
@@ -2790,6 +2816,10 @@ declare module '@atcute/client/lexicons' {
 		};
 		'app.bsky.unspecced.getTaggedSuggestions': {
 			output: AppBskyUnspeccedGetTaggedSuggestions.Output;
+		};
+		'app.bsky.unspecced.getTrendingTopics': {
+			params: AppBskyUnspeccedGetTrendingTopics.Params;
+			output: AppBskyUnspeccedGetTrendingTopics.Output;
 		};
 		'app.bsky.unspecced.searchActorsSkeleton': {
 			params: AppBskyUnspeccedSearchActorsSkeleton.Params;
