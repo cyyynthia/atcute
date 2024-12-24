@@ -24,8 +24,7 @@
 		"prepublish": "rm -rf dist; pnpm run build"
 	},
 	"dependencies": {
-		"@atcute/client": "workspace:^",
-		"nanoid": "^5.0.7"
+		"@atcute/client": "workspace:^"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.1.12"

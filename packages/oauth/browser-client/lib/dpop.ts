@@ -1,5 +1,3 @@
-import { nanoid } from 'nanoid/non-secure';
-
 import { database } from './environment.js';
 import type { DPoPKey } from './types/dpop.js';
 import { extractContentType } from './utils/response.js';
@@ -35,8 +33,7 @@ export const createDPoPSignage = (issuer: string, dpopKey: DPoPKey) => {
 		const payload = {
 			iss: issuer,
 			iat: now,
-			// This seems fine, we can remake the request if it fails.
-			jti: nanoid(12),
+			jti: crypto.randomUUID(),
 			htm: method,
 			htu: url,
 			nonce: nonce,
