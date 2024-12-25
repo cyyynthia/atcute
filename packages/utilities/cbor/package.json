@@ -29,7 +29,7 @@
 		"mitata": "^1.0.10"
 	},
 	"dependencies": {
-		"@atcute/base32": "workspace:^",
-		"@atcute/cid": "workspace:^"
+		"@atcute/cid": "workspace:^",
+		"@atcute/multibase": "workspace:^"
 	}
 }

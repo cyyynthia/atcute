@@ -1,4 +1,4 @@
-import { decode, encode } from './base64.js';
+import { fromBase64, toBase64 } from '@atcute/multibase';
 
 export interface Bytes {
 	$bytes: string;
@@ -8,7 +8,7 @@ export class BytesWrapper implements Bytes {
 	constructor(public buf: Uint8Array) {}
 
 	get $bytes(): string {
-		return encode(this.buf);
+		return toBase64(this.buf);
 	}
 
 	toJSON(): Bytes {
@@ -25,5 +25,5 @@ export const fromBytes = (bytes: Bytes): Uint8Array => {
 		return bytes.buf;
 	}
 
-	return decode(bytes.$bytes);
+	return fromBase64(bytes.$bytes);
 };

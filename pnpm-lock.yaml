@@ -210,12 +210,12 @@ importers:
 
   packages/utilities/cbor:
     dependencies:
-      '@atcute/base32':
-        specifier: workspace:^
-        version: link:../base32
       '@atcute/cid':
         specifier: workspace:^
         version: link:../cid
+      '@atcute/multibase':
+        specifier: workspace:^
+        version: link:../multibase
     devDependencies:
       '@ipld/dag-cbor':
         specifier: ^9.2.1
