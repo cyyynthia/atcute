@@ -41,7 +41,7 @@ of atcute.
 | [`cid`](./packages/utilities/cid): CIDv1 codec                                                                         |
 | [`cbor`](./packages/utilities/cbor): DAG-CBOR codec                                                                    |
 | [`varint`](./packages/utilities/varint): Protobuf-style varint codec                                                   |
-| [`base32`](./packages/utilities/base32): base32 codec                                                                  |
+| [`multibase`](./packages/utilities/multibase): Multibase utilities                                                     |
 | **Bluesky-specific packages**                                                                                          |
 | [`bluesky-richtext-builder`](./packages/bluesky/richtext-builder): builder pattern for Bluesky's rich text facets      |
 | [`bluesky-richtext-parser`](./packages/bluesky/richtext-parser): parse Bluesky's (extended) rich text syntax           |
