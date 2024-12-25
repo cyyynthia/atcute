@@ -1,27 +1,27 @@
 import { expect, it } from 'bun:test';
 
-import { fromBase58Btc, toBase58Btc } from './base58.js';
+import { fromBase32, toBase32 } from './base32.js';
 
 const inputs = [
 	{
 		text: `Decentralize everything!!`,
-		encoded: `UXE7GvtEk8XTXs1GF8HSGbVA9FCX9SEBPe`,
+		encoded: `irswgzloorzgc3djpjssazlwmvzhs5dinfxgoijb`,
 	},
 	{
 		text: `yes mani !`,
-		encoded: `7paNL19xttacUY`,
+		encoded: `pfsxgidnmfxgsibb`,
 	},
 	{
 		text: `hello world`,
-		encoded: `StV1DL6CwTryKyV`,
+		encoded: `nbswy3dpeb3w64tmmq`,
 	},
 	{
 		text: `\x00yes mani !`,
-		encoded: `17paNL19xttacUY`,
+		encoded: `ab4wk4zanvqw42jaee`,
 	},
 	{
 		text: `\x00\x00yes mani !`,
-		encoded: `117paNL19xttacUY`,
+		encoded: `aaahszltebwwc3tjeaqq`,
 	},
 ];
 
@@ -29,7 +29,7 @@ it('can encode', () => {
 	const encoder = new TextEncoder();
 
 	for (const { text, encoded } of inputs) {
-		expect(toBase58Btc(encoder.encode(text))).toBe(encoded);
+		expect(toBase32(encoder.encode(text))).toBe(encoded);
 	}
 });
 
@@ -37,6 +37,6 @@ it('can decode', () => {
 	const decoder = new TextDecoder();
 
 	for (const { text, encoded } of inputs) {
-		expect(decoder.decode(fromBase58Btc(encoded))).toBe(text);
+		expect(decoder.decode(fromBase32(encoded))).toBe(text);
 	}
 });
