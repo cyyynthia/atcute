@@ -229,9 +229,9 @@ importers:
 
   packages/utilities/cid:
     dependencies:
-      '@atcute/base32':
+      '@atcute/multibase':
         specifier: workspace:^
-        version: link:../base32
+        version: link:../multibase
       '@atcute/varint':
         specifier: workspace:^
         version: link:../varint

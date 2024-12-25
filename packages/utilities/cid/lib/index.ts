@@ -9,7 +9,7 @@
  * - Multihash: `sha-256` (0x12)
  */
 
-import * as base32 from '@atcute/base32';
+import { fromBase32, toBase32 } from '@atcute/multibase';
 import * as varint from '@atcute/varint';
 
 /**
@@ -52,7 +52,7 @@ export const parse = (cid: string): CID => {
 		throw new Error(`only base32 cidv1 is supported`);
 	}
 
-	const bytes = base32.decode(cid.slice(1));
+	const bytes = fromBase32(cid.slice(1));
 	return decode(bytes);
 };
 
@@ -155,7 +155,7 @@ export const create = async (code: number, input: Uint8Array): Promise<CID> => {
  * Serialize CID into a string
  */
 export const format = (cid: CID): string => {
-	return 'b' + base32.encode(cid.bytes);
+	return 'b' + toBase32(cid.bytes);
 };
 
 export const createDigest = (code: number, digest: Uint8Array): Digest => {
