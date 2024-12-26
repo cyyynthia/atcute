@@ -48,3 +48,22 @@ of atcute.
 | [`bluesky-richtext-parser`](./packages/bluesky/richtext-parser): parse Bluesky's (extended) rich text syntax           |
 | [`bluesky-richtext-segmenter`](./packages/bluesky/richtext-segmenter): segments Bluesky's rich text facets into tokens |
 | [`bluesky-threading`](./packages/bluesky/threading): create Bluesky threads containing multiple posts with one write   |
+
+## contribution guide
+
+this monorepo uses [`mise`](https://mise.jdx.dev) to handle versioning, although it doesn't really
+matter. Node.js LTS is necessary to use the `internal-dev-env` package for testing the `client`
+package with the official PDS distribution, but otherwise you can (and should) use the latest
+available version.
+
+```sh
+# Install all the recommended runtimes
+mise install
+
+# Runs all the build scripts
+pnpm run -r build
+
+# Pull in the latest ATProto/Ozone/Bluesky lexicons, and generate the type declarations
+pnpm run pull
+pnpm run -r generate
+```
