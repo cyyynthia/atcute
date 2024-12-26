@@ -8,7 +8,7 @@ export const P256_PUBLIC_PREFIX = Uint8Array.from([0x80, 0x24]);
 export const P256_PRIVATE_PREFIX = Uint8Array.from([0x86, 0x26]);
 
 export class P256PublicKey implements PublicKey {
-	readonly type = 'nistp256';
+	readonly type = 'p256';
 
 	/** @internal */
 	protected _publicKey: Uint8Array;
