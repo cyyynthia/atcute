@@ -1,12 +1,12 @@
 import * as CBOR from '@atcute/cbor';
-import * as varint from '@atcute/varint';
 import * as CID from '@atcute/cid';
+import * as varint from '@atcute/varint';
 
 import type { SyncByteReader } from './byte-reader.js';
 
 interface CarV1Header {
 	version: 1;
-	roots: CBOR.CIDLink[];
+	roots: CID.CidLink[];
 }
 
 const isCarV1Header = (value: unknown): value is CarV1Header => {
@@ -15,7 +15,7 @@ const isCarV1Header = (value: unknown): value is CarV1Header => {
 	}
 
 	const { version, roots } = value as CarV1Header;
-	return version === 1 && Array.isArray(roots) && roots.every((root) => root instanceof CBOR.CIDLinkWrapper);
+	return version === 1 && Array.isArray(roots) && roots.every((root) => root instanceof CBOR.CidLinkWrapper);
 };
 
 const readVarint = (reader: SyncByteReader, size: number): number => {
@@ -45,45 +45,44 @@ const readHeader = (reader: SyncByteReader): CarV1Header => {
 	return header;
 };
 
-const readMultihashDigest = (reader: SyncByteReader): CID.Digest => {
-	const first = reader.upto(8);
+const readCid = (reader: SyncByteReader): CID.Cid => {
+	const head = reader.upto(3 + 4);
 
-	const [code, codeOffset] = varint.decode(first);
-	const [size, sizeOffset] = varint.decode(first.subarray(codeOffset));
+	const version = head[0];
+	const codec = head[1];
+	const digestCodec = head[2];
 
-	const offset = codeOffset + sizeOffset;
-
-	const bytes = reader.exactly(offset + size, true);
-	const digest = bytes.subarray(offset);
-
-	return {
-		code: code,
-		size: size,
-		digest: digest,
-		bytes: bytes,
-	};
-};
-
-const readCid = (reader: SyncByteReader): CID.CID => {
-	const version = readVarint(reader, 8);
-	if (version !== 1) {
-		throw new Error(`expected a cidv1`);
+	if (version !== CID.CID_VERSION) {
+		throw new RangeError(`incorrect cid version (got v${version})`);
 	}
 
-	const codec = readVarint(reader, 8);
-	const digest = readMultihashDigest(reader);
+	if (codec !== CID.CODEC_DCBOR && codec !== CID.CODEC_RAW) {
+		throw new RangeError(`incorrect cid codec (got 0x${codec.toString(16)})`);
+	}
 
-	const cid: CID.CID = {
+	if (digestCodec !== CID.HASH_SHA256) {
+		throw new RangeError(`incorrect cid hash type (got 0x${digestCodec.toString(16)})`);
+	}
+
+	const [digestSize, digestLebSize] = varint.decode(head, 3);
+
+	const bytes = reader.exactly(3 + digestLebSize + digestSize, true);
+	const digest = bytes.subarray(3 + digestLebSize);
+
+	const cid: CID.Cid = {
 		version: version,
-		code: codec,
-		digest: digest,
-		bytes: CID.encode(version, codec, digest.bytes),
+		codec: codec,
+		digest: {
+			codec: digestCodec,
+			contents: digest,
+		},
+		bytes: bytes,
 	};
 
 	return cid;
 };
 
-const readBlockHeader = (reader: SyncByteReader): { cid: CID.CID; blockSize: number } => {
+const readBlockHeader = (reader: SyncByteReader): { cid: CID.Cid; blockSize: number } => {
 	const start = reader.pos;
 
 	let size = readVarint(reader, 8);
@@ -104,7 +103,7 @@ export const createCarReader = (reader: SyncByteReader) => {
 
 	return {
 		roots,
-		*iterate(): Generator<{ cid: CID.CID; bytes: Uint8Array }> {
+		*iterate(): Generator<{ cid: CID.Cid; bytes: Uint8Array }> {
 			while (reader.upto(8).length > 0) {
 				const { cid, blockSize } = readBlockHeader(reader);
 				const bytes = reader.exactly(blockSize, true);

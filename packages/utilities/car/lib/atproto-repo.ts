@@ -9,7 +9,7 @@ export class RepoEntry {
 	constructor(
 		public readonly collection: string,
 		public readonly rkey: string,
-		public readonly cid: CBOR.CIDLink,
+		public readonly cid: CID.CidLink,
 		private blockmap: BlockMap,
 	) {}
 
@@ -25,7 +25,7 @@ export function* iterateAtpRepo(buf: Uint8Array): Generator<RepoEntry> {
 	// Collect all archive entries into a mapping of CID string -> actual bytes
 	const blockmap: BlockMap = new Map();
 	for (const entry of iterate()) {
-		blockmap.set(CID.format(entry.cid), entry.bytes);
+		blockmap.set(CID.toString(entry.cid), entry.bytes);
 	}
 
 	// Read the head, then walk through the MST tree from there.
@@ -37,10 +37,7 @@ export function* iterateAtpRepo(buf: Uint8Array): Generator<RepoEntry> {
 	}
 }
 
-/** @deprecated Use `iterateAtpRepo` instead */
-export const iterateAtpCar = iterateAtpRepo;
-
-function readObject(map: BlockMap, link: CBOR.CIDLink): unknown {
+function readObject(map: BlockMap, link: CID.CidLink): unknown {
 	const cid = link.$link;
 
 	const bytes = map.get(cid);
@@ -51,7 +48,7 @@ function readObject(map: BlockMap, link: CBOR.CIDLink): unknown {
 	return data;
 }
 
-function* walkEntries(map: BlockMap, pointer: CBOR.CIDLink): Generator<NodeEntry> {
+function* walkEntries(map: BlockMap, pointer: CID.CidLink): Generator<NodeEntry> {
 	const data = readObject(map, pointer) as MstNode;
 	const entries = data.e;
 
@@ -88,9 +85,9 @@ type BlockMap = Map<string, Uint8Array>;
 interface Commit {
 	version: 3;
 	did: string;
-	data: CBOR.CIDLink;
+	data: CID.CidLink;
 	rev: string;
-	prev: CBOR.CIDLink | null;
+	prev: CID.CidLink | null;
 	sig: CBOR.Bytes;
 }
 
@@ -100,19 +97,19 @@ interface TreeEntry {
 	/** remainder of key for this TreeEntry, after "prefixlen" have been removed */
 	k: CBOR.Bytes;
 	/** link to a sub-tree Node at a lower level which has keys sorting after this TreeEntry's key (to the "right"), but before the next TreeEntry's key in this Node (if any) */
-	v: CBOR.CIDLink;
+	v: CID.CidLink;
 	/** next subtree (to the right of leaf) */
-	t: CBOR.CIDLink | null;
+	t: CID.CidLink | null;
 }
 
 interface MstNode {
 	/** link to sub-tree Node on a lower level and with all keys sorting before keys at this node */
-	l: CBOR.CIDLink | null;
+	l: CID.CidLink | null;
 	/** ordered list of TreeEntry objects */
 	e: TreeEntry[];
 }
 
 interface NodeEntry {
 	key: string;
-	cid: CBOR.CIDLink;
+	cid: CID.CidLink;
 }

@@ -1,6 +1,6 @@
 import { expect, it } from 'bun:test';
 
-import { iterateAtpRepo } from './index.js';
+import { iterateAtpRepo } from './atproto-repo.js';
 
 it('decodes atproto car files', () => {
 	const buf = Buffer.from(

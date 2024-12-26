@@ -5,6 +5,3 @@ export const readCar = (buffer: Uint8Array) => {
 	const reader = createUint8Reader(buffer);
 	return createCarReader(reader);
 };
-
-/** @deprecated Use `readCar` instead */
-export const fromUint8Array = readCar;
