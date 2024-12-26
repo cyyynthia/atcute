@@ -1,5 +1,6 @@
+import { CidLinkWrapper, fromString, type CidLink } from '@atcute/cid';
+
 import { BytesWrapper, fromBytes, type Bytes } from './bytes.js';
-import { CIDLinkWrapper, fromCIDLink, type CIDLink } from './cid-link.js';
 
 const CHUNK_SIZE = 1024;
 
@@ -148,9 +149,10 @@ const writeBytes = (state: State, val: Bytes): void => {
 	state.p += len;
 };
 
-const writeCid = (state: State, val: CIDLink): void => {
+const writeCid = (state: State, val: CidLink): void => {
 	// CID bytes are prefixed with 0x00 for historical reasons, apparently.
-	const buf = fromCIDLink(val).bytes;
+
+	const buf = val instanceof CidLinkWrapper ? val.bytes : fromString(val.$link).bytes;
 	const len = buf.byteLength + 1;
 
 	writeTypeAndArgument(state, 6, 42);
@@ -203,7 +205,7 @@ const writeValue = (state: State, val: any): void => {
 		}
 
 		if ('$link' in val) {
-			if (val instanceof CIDLinkWrapper || typeof val.$link === 'string') {
+			if (val instanceof CidLinkWrapper || typeof val.$link === 'string') {
 				writeCid(state, val);
 				return;
 			}

@@ -2,7 +2,7 @@ import { expect, it } from 'bun:test';
 
 import * as CID from '@atcute/cid';
 
-import { decode, decodeFirst, encode, toBytes, toCIDLink } from './index.js';
+import { decode, decodeFirst, encode, toBytes, toCidLink } from './index.js';
 
 const utf8e = new TextEncoder();
 // const utf8d = new TextDecoder();
@@ -10,7 +10,7 @@ const utf8e = new TextEncoder();
 it('encodes and decodes into the same value', () => {
 	const object = {
 		key: 'value',
-		link: toCIDLink(CID.parse('bafyreihffx5a2e7k5uwrmmgofbvzujc5cmw5h4espouwuxt3liqoflx3ee')),
+		link: toCidLink(CID.fromString('bafyreihffx5a2e7k5uwrmmgofbvzujc5cmw5h4espouwuxt3liqoflx3ee')),
 		bytes: toBytes(utf8e.encode('lorem ipsum sit dolor amet')),
 		answer: 42,
 		correct: true,
@@ -83,7 +83,7 @@ it('encodes this atproto post record', async () => {
 
 	const encoded = encode(record);
 
-	expect(CID.format(await CID.create(0x71, encoded))).toBe(
+	expect(CID.toString(await CID.create(0x71, encoded))).toBe(
 		'bafyreicbb3p4hmtm7iw3k7kiydzqp7qhufq3jdc5sbc4gxa4mxqd6bywba',
 	);
 });
