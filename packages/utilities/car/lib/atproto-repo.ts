@@ -19,7 +19,7 @@ export class RepoEntry {
 }
 
 export function* iterateAtpRepo(buf: Uint8Array): Generator<RepoEntry> {
-	const { roots, iterate } = readCar(new Uint8Array(buf));
+	const { roots, iterate } = readCar(buf);
 	assert(roots.length === 1, `expected only 1 root in the car archive; got=${roots.length}`);
 
 	// Collect all archive entries into a mapping of CID string -> actual bytes
