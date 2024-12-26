@@ -9,7 +9,12 @@ import { decodeJwt } from './utils/jwt.js';
 /** Interface for the decoded access token, for convenience */
 export interface AtpAccessJwt {
 	/** Access token scope, app password returns a different scope. */
-	scope: 'com.atproto.access' | 'com.atproto.appPass' | 'com.atproto.appPassPrivileged';
+	scope:
+		| 'com.atproto.access'
+		| 'com.atproto.appPass'
+		| 'com.atproto.appPassPrivileged'
+		| 'com.atproto.signupQueued'
+		| 'com.atproto.takendown';
 	/** Account DID */
 	sub: At.DID;
 	/** Expiration time */
@@ -264,6 +269,7 @@ export class CredentialManager implements FetchHandlerObject {
 				identifier: options.identifier,
 				password: options.password,
 				authFactorToken: options.code,
+				allowTakendown: options.allowTakendown,
 			},
 		});
 
@@ -279,6 +285,8 @@ export interface AuthLoginOptions {
 	password: string;
 	/** Two-factor authentication code */
 	code?: string;
+	/** Allow signing in even if the account has been taken down,  */
+	allowTakendown?: boolean;
 }
 
 const isExpiredTokenResponse = async (response: Response): Promise<boolean> => {
