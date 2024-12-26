@@ -945,6 +945,8 @@ export declare namespace ComAtprotoServerCreateSession {
 		/** Handle or other identifier supported by the server for the authenticating user. */
 		identifier: string;
 		password: string;
+		/** When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned */
+		allowTakendown?: boolean;
 		authFactorToken?: string;
 	}
 	interface Output {

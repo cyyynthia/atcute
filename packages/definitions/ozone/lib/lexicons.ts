@@ -624,6 +624,12 @@ declare module '@atcute/client/lexicons' {
 			limit?: number;
 			/** When set to true, only muted subjects and reporters will be returned. */
 			onlyMuted?: boolean;
+			/** Number of queues being used by moderators. Subjects will be split among all queues. */
+			queueCount?: number;
+			/** Index of the queue to fetch subjects from. Works only when queueCount value is specified. */
+			queueIndex?: number;
+			/** A seeder to shuffle/balance the queue items. */
+			queueSeed?: string;
 			/** Search subjects reported after a given timestamp */
 			reportedAfter?: string;
 			/** Search subjects reported before a given timestamp */
@@ -642,6 +648,10 @@ declare module '@atcute/client/lexicons' {
 			subject?: string;
 			/** If specified, subjects of the given type (account or record) will be returned. When this is set to 'account' the 'collections' parameter will be ignored. When includeAllUserRecords or subject is set, this will be ignored. */
 			subjectType?: 'account' | 'record' | (string & {});
+			/**
+			 * Items in this array are applied with OR filters. To apply AND filter, put all tags in the same string and separate using && characters \
+			 * Maximum string length: 25
+			 */
 			tags?: string[];
 			/** Get subjects that were taken down */
 			takendown?: boolean;
