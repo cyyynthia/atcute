@@ -56,7 +56,7 @@ export class TestPdsServer {
 			modServiceDid: 'did:example:invalid',
 			plcRotationKeyK256PrivateKeyHex: plcRotationPriv,
 			inviteRequired: false,
-			fetchDisableSsrfProtection: true,
+			disableSsrfProtection: true,
 			serviceName: 'Development PDS',
 			brandColor: '#ffcb1e',
 			errorColor: undefined,
