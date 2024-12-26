@@ -24,10 +24,11 @@
 		"prepublish": "rm -rf dist; pnpm run build"
 	},
 	"devDependencies": {
-		"@types/bun": "^1.1.12"
+		"@types/bun": "^1.1.12",
+		"@noble/curves": "^1.7.0"
 	},
 	"dependencies": {
 		"@atcute/multibase": "workspace:^",
-		"@noble/curves": "^1.7.0"
+		"@noble/secp256k1": "^2.1.0"
 	}
 }

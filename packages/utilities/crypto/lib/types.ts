@@ -3,9 +3,9 @@
  */
 export interface PublicKey {
 	/** Returns the public key bytes */
-	bytes(): Uint8Array;
+	bytes(): Promise<Uint8Array>;
 	/** Returns a did:key representation of the public key */
-	did(): `did:key:${string}`;
+	did(): Promise<`did:key:${string}`>;
 	/** Verifies a signature against a provided data */
 	verify(sig: Uint8Array, data: Uint8Array, options?: VerifyOptions): Promise<boolean>;
 }
@@ -23,8 +23,8 @@ export interface PrivateKey extends PublicKey {
  */
 export interface PrivateKeyExportable extends PrivateKey {
 	/** Exports the private key */
-	export(type: 'hex' | 'multikey'): string;
-	export(type: 'bytes'): Uint8Array;
+	export(type: 'hex' | 'multikey'): Promise<string>;
+	export(type: 'bytes'): Promise<Uint8Array>;
 }
 
 export interface VerifyOptions {
