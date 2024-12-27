@@ -102,7 +102,7 @@ describe('interop tests', () => {
 		expect(isValidSig).toBe(false);
 	});
 
-	it('exports the expected keys', async () => {
+	it('derives the expected did:key', async () => {
 		const inputs = [
 			{
 				privateKeyBytesBase58: '9p4VRzdmhsnq869vQjVCTrRry7u4TtfRxhvBFJTGU2Cp',
