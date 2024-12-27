@@ -1,6 +1,6 @@
-import { expect, it } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 
-import { _fromBase16Polyfill, _toBase16Polyfill } from './base16.js';
+import { _fromBase16Native, _fromBase16Polyfill, _toBase16Native, _toBase16Polyfill } from './base16.js';
 
 const inputs = [
 	{
@@ -25,18 +25,38 @@ const inputs = [
 	},
 ];
 
-it('can encode', () => {
-	const encoder = new TextEncoder();
+describe('polyfill', () => {
+	it('can encode', () => {
+		const encoder = new TextEncoder();
 
-	for (const { text, encoded } of inputs) {
-		expect(_toBase16Polyfill(encoder.encode(text))).toBe(encoded);
-	}
+		for (const { text, encoded } of inputs) {
+			expect(_toBase16Polyfill(encoder.encode(text))).toBe(encoded);
+		}
+	});
+
+	it('can decode', () => {
+		const decoder = new TextDecoder();
+
+		for (const { text, encoded } of inputs) {
+			expect(decoder.decode(_fromBase16Polyfill(encoded))).toBe(text);
+		}
+	});
 });
 
-it('can decode', () => {
-	const decoder = new TextDecoder();
+describe('native', () => {
+	it('can encode', () => {
+		const encoder = new TextEncoder();
 
-	for (const { text, encoded } of inputs) {
-		expect(decoder.decode(_fromBase16Polyfill(encoded))).toBe(text);
-	}
+		for (const { text, encoded } of inputs) {
+			expect(_toBase16Native(encoder.encode(text))).toBe(encoded);
+		}
+	});
+
+	it('can decode', () => {
+		const decoder = new TextDecoder();
+
+		for (const { text, encoded } of inputs) {
+			expect(decoder.decode(_fromBase16Native(encoded))).toBe(text);
+		}
+	});
 });
