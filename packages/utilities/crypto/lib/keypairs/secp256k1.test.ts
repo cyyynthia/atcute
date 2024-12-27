@@ -83,7 +83,7 @@ describe('interop tests', () => {
 		expect(isValidSig).toBe(true);
 	});
 
-	it('throws on DER-encoded signature', async () => {
+	it('throws on DER-encoded signature by default', async () => {
 		const payload = {
 			message: `oWVoZWxsb2V3b3JsZA`,
 			sig: `MEUCIQCWumUqJqOCqInXF7AzhIRg2MhwRz2rWZcOEsOjPmNItgIgXJH7RnqfYY6M0eg33wU0sFYDlprwdOcpRn78Sz5ePgk`,
@@ -100,6 +100,63 @@ describe('interop tests', () => {
 		const isValidSig = await keypair.verify(sigBytes, messageBytes);
 
 		expect(isValidSig).toBe(false);
+	});
+
+	it('handles DER-encoded signature when specified', async () => {
+		const payload = {
+			message: `oWVoZWxsb2V3b3JsZA`,
+			sig: `MEUCIQCWumUqJqOCqInXF7AzhIRg2MhwRz2rWZcOEsOjPmNItgIgXJH7RnqfYY6M0eg33wU0sFYDlprwdOcpRn78Sz5ePgk`,
+			publicDidKey: `did:key:zQ3shnriYMXc8wvkbJqfNWh5GXn2bVAeqTC92YuNbek4npqGF`,
+		};
+
+		const messageBytes = fromBase64(payload.message);
+		const sigBytes = fromBase64(payload.sig);
+
+		const parsed = parseDidKey(payload.publicDidKey);
+		expect(parsed.type).toBe('secp256k1');
+
+		const keypair = new Secp256k1PublicKey(parsed.publicKey);
+		const isValidSig = await keypair.verify(sigBytes, messageBytes, { allowMalleableSig: true });
+
+		expect(isValidSig).toBe(true);
+	});
+
+	it('throws on DER-encoded signature crafted to look like compact signature', async () => {
+		const payload = {
+			message: `V3pYaEhvTGlrVkJhMGdOZw`,
+			sig: `MD4CHRwVbupYdWlkNoZkAalJj4m2aRaFCvuKf+vjXh6kAh0RiqzBBCJsol9VNOVX6GcbSHj/sNAixbnlVOqK0w`,
+			publicDidKey: `did:key:zQ3shWScmW4msQ7wxwgX4P2nvocGtfxwfxQGSLw7kSCoVMRq9`,
+		};
+
+		const messageBytes = fromBase64(payload.message);
+		const sigBytes = fromBase64(payload.sig);
+
+		const parsed = parseDidKey(payload.publicDidKey);
+		expect(parsed.type).toBe('secp256k1');
+
+		const keypair = new Secp256k1PublicKey(parsed.publicKey);
+		const isValidSig = await keypair.verify(sigBytes, messageBytes);
+
+		expect(isValidSig).toBe(false);
+	});
+
+	it('handles DER-encoded signature crafted to look like compact signature when specified', async () => {
+		const payload = {
+			message: `V3pYaEhvTGlrVkJhMGdOZw`,
+			sig: `MD4CHRwVbupYdWlkNoZkAalJj4m2aRaFCvuKf+vjXh6kAh0RiqzBBCJsol9VNOVX6GcbSHj/sNAixbnlVOqK0w`,
+			publicDidKey: `did:key:zQ3shWScmW4msQ7wxwgX4P2nvocGtfxwfxQGSLw7kSCoVMRq9`,
+		};
+
+		const messageBytes = fromBase64(payload.message);
+		const sigBytes = fromBase64(payload.sig);
+
+		const parsed = parseDidKey(payload.publicDidKey);
+		expect(parsed.type).toBe('secp256k1');
+
+		const keypair = new Secp256k1PublicKey(parsed.publicKey);
+		const isValidSig = await keypair.verify(sigBytes, messageBytes, { allowMalleableSig: true });
+
+		expect(isValidSig).toBe(true);
 	});
 
 	it('derives the expected did:key', async () => {
