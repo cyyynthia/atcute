@@ -26,7 +26,7 @@ it('produces valid signatures', async () => {
 });
 
 describe('interop tests', () => {
-	it('handles valid low-S signature', async () => {
+	it('handles low-S signature', async () => {
 		const payload = {
 			message: `oWVoZWxsb2V3b3JsZA`,
 			sig: `5WpdIuEUUfVUYaozsi8G0B3cWO09cgZbIIwg1t2YKdUn/FEznOndsz/qgiYb89zwxYCbB71f7yQK5Lr7NasfoA`,
@@ -45,7 +45,7 @@ describe('interop tests', () => {
 		expect(isValidSig).toBe(true);
 	});
 
-	it('throws on non-low-S signature', async () => {
+	it('throws on high-S signature by default', async () => {
 		const payload = {
 			message: `oWVoZWxsb2V3b3JsZA`,
 			sig: `5WpdIuEUUfVUYaozsi8G0B3cWO09cgZbIIwg1t2YKdXYA67MYxYiTMAVfdnkDCMN9S5B3vHosRe07aORmoshoQ`,
@@ -62,6 +62,25 @@ describe('interop tests', () => {
 		const isValidSig = await keypair.verify(sigBytes, messageBytes);
 
 		expect(isValidSig).toBe(false);
+	});
+
+	it('handles high-S signature when specified', async () => {
+		const payload = {
+			message: `oWVoZWxsb2V3b3JsZA`,
+			sig: `5WpdIuEUUfVUYaozsi8G0B3cWO09cgZbIIwg1t2YKdXYA67MYxYiTMAVfdnkDCMN9S5B3vHosRe07aORmoshoQ`,
+			publicDidKey: `did:key:zQ3shqwJEJyMBsBXCWyCBpUBMqxcon9oHB7mCvx4sSpMdLJwc`,
+		};
+
+		const messageBytes = fromBase64(payload.message);
+		const sigBytes = fromBase64(payload.sig);
+
+		const parsed = parseDidKey(payload.publicDidKey);
+		expect(parsed.type).toBe('secp256k1');
+
+		const keypair = new Secp256k1PublicKey(parsed.publicKey);
+		const isValidSig = await keypair.verify(sigBytes, messageBytes, { allowMalleableSig: true });
+
+		expect(isValidSig).toBe(true);
 	});
 
 	it('throws on DER-encoded signature', async () => {
