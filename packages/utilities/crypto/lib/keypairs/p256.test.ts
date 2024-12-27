@@ -83,7 +83,7 @@ describe('interop tests', () => {
 		expect(isValidSig).toBe(true);
 	});
 
-	it('throws on DER-encoded signature', async () => {
+	it('throws on DER-encoded signature by default', async () => {
 		const payload = {
 			message: `oWVoZWxsb2V3b3JsZA`,
 			sig: `MEQCIFxYelWJ9lNcAVt+jK0y/T+DC/X4ohFZ+m8f9SEItkY1AiACX7eXz5sgtaRrz/SdPR8kprnbHMQVde0T2R8yOTBweA`,
@@ -100,6 +100,25 @@ describe('interop tests', () => {
 		const isValidSig = await keypair.verify(sigBytes, messageBytes);
 
 		expect(isValidSig).toBe(false);
+	});
+
+	it('handles DER-encoded signature when specified', async () => {
+		const payload = {
+			message: `oWVoZWxsb2V3b3JsZA`,
+			sig: `MEQCIFxYelWJ9lNcAVt+jK0y/T+DC/X4ohFZ+m8f9SEItkY1AiACX7eXz5sgtaRrz/SdPR8kprnbHMQVde0T2R8yOTBweA`,
+			didKey: `did:key:zDnaeT6hL2RnTdUhAPLij1QBkhYZnmuKyM7puQLW1tkF4Zkt8`,
+		};
+
+		const messageBytes = fromBase64(payload.message);
+		const sigBytes = fromBase64(payload.sig);
+
+		const parsed = parseDidKey(payload.didKey);
+		expect(parsed.type).toBe('p256');
+
+		const keypair = new P256PublicKey(parsed.publicKey);
+		const isValidSig = await keypair.verify(sigBytes, messageBytes, { allowMalleableSig: true });
+
+		expect(isValidSig).toBe(true);
 	});
 
 	it('derives the expected did:key', async () => {
