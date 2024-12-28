@@ -21,12 +21,12 @@
 		"prepublish": "rm -rf dist; pnpm run build"
 	},
 	"dependencies": {
-		"@badrap/valita": "^0.3.11",
+		"@badrap/valita": "^0.3.16",
 		"@externdefs/collider": "^0.1.0",
 		"picocolors": "^1.1.1",
-		"prettier": "^3.3.3"
+		"prettier": "^3.4.2"
 	},
 	"devDependencies": {
-		"@types/node": "^22.8.1"
+		"@types/node": "^22.10.2"
 	}
 }
