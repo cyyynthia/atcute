@@ -28,13 +28,27 @@ it('produces valid signatures', async () => {
 
 	const data = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
 
-	const sig = await keypair.sign(data);
 	const hash = await toSha256(data);
+	const sig = await keypair.sign(data);
 
 	expect(keypair.verify(sig, data)).resolves.toBe(true);
 
 	expect(p256.verify(sig, hash, publicKeyBytes, { format: 'compact', lowS: true })).toBe(true);
 	expect(p256.verify(sig, hash, publicKeyBytes, { format: 'der' })).toBe(false);
+});
+
+it('verifies valid signatures', async () => {
+	const privateKeyBytes = p256.utils.randomPrivateKey();
+	const publicKeyBytes = p256.getPublicKey(privateKeyBytes);
+
+	const keypair = await P256PublicKey.importRaw(publicKeyBytes);
+
+	const data = new Uint8Array([8, 7, 6, 5, 4, 3, 2, 1]);
+
+	const hash = await toSha256(data);
+	const sig = p256.sign(hash, privateKeyBytes, { lowS: true }).toCompactRawBytes();
+
+	expect(keypair.verify(sig, data)).resolves.toBe(true);
 });
 
 describe('.importCryptoKey()', () => {
