@@ -2,8 +2,9 @@ import { toBase16, toBase58Btc } from '@atcute/multibase';
 import { secp256k1 } from '@noble/curves/secp256k1';
 
 import type { PrivateKey, PrivateKeyExportable, PublicKey, VerifyOptions } from '../types.js';
-import { concatBuffers, toSha256 } from '../utils.js';
+import { checkUnreachable, concatBuffers, toSha256 } from '../utils.js';
 
+// Reference: https://atproto.com/specs/cryptography#public-key-encoding
 export const SECP256K1_PUBLIC_PREFIX = Uint8Array.from([0xe7, 0x01]);
 export const SECP256K1_PRIVATE_PREFIX = Uint8Array.from([0x81, 0x26]);
 
@@ -32,7 +33,7 @@ export class Secp256k1PublicKey implements PublicKey {
 
 		return secp256k1.verify(sig, hashed, this._publicKey, {
 			lowS: !allowMalleable,
-			format: !allowMalleable ? 'compact' : undefined,
+			format: 'compact',
 		});
 	}
 }
@@ -76,7 +77,7 @@ export class Secp256k1PrivateKeyExportable extends Secp256k1PrivateKey implement
 			}
 		}
 
-		throw new Error(`unknown "${type}" export type`);
+		checkUnreachable(type, `unknown "${type}" export type`);
 	}
 }
 
