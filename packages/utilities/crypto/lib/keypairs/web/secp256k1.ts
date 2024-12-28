@@ -16,7 +16,7 @@ function toJsonWebKey(publicKey: Uint8Array, privateKey?: Uint8Array): JsonWebKe
 
 	// Decompress point so we can encode both x and y.
 	// Could just make it a bool, but it's not recommended [4] and poorly supported.
-	const point = ProjectivePoint.fromHex(publicKey).toRawBytes(false)
+	const point = ProjectivePoint.fromHex(publicKey).toRawBytes(false);
 
 	const key = {
 		kty: 'EC', // [2]; [3] § 3.1.
@@ -24,17 +24,17 @@ function toJsonWebKey(publicKey: Uint8Array, privateKey?: Uint8Array): JsonWebKe
 		alg: 'ES256K', // [1] § 4.4.; [3] § 3.2.
 		x: toBase64Url(point.subarray(1, 33)), // [2] § 6.2.1.2.
 		y: toBase64Url(point.subarray(33, 65)), // [2] § 6.2.1.3.
-		key_ops: ['verify', 'sign'] // [1] § 4.3.
-	}
+		key_ops: ['verify', 'sign'], // [1] § 4.3.
+	};
 
 	if (privateKey) {
 		// Private parameters
 		Object.assign(key, {
 			d: toBase64Url(privateKey), // [2] § 6.2.2.1.
-		})
+		});
 	}
 
-	return key
+	return key;
 }
 
 export class Secp256k1PublicKey implements PublicKey {
@@ -69,17 +69,19 @@ export class Secp256k1PublicKey implements PublicKey {
 	exportPublicKey(format: 'rawHex'): Promise<string>;
 	exportPublicKey(format: 'multikey'): Promise<string>;
 	exportPublicKey(format: 'jwk'): Promise<JsonWebKey>;
-	async exportPublicKey(format: 'raw' | 'rawHex' | 'multikey' | 'jwk'): Promise<Uint8Array | string | JsonWebKey> {
+	async exportPublicKey(
+		format: 'raw' | 'rawHex' | 'multikey' | 'jwk',
+	): Promise<Uint8Array | string | JsonWebKey> {
 		if (format === 'jwk') {
-			return toJsonWebKey(this._publicKey)
+			return toJsonWebKey(this._publicKey);
 		}
 
 		switch (format) {
 			case 'raw': {
-				return this._publicKey
+				return this._publicKey;
 			}
 			case 'rawHex': {
-				return toBase16(this._publicKey)
+				return toBase16(this._publicKey);
 			}
 			case 'multikey': {
 				const encoded = toBase58Btc(concatBuffers([SECP256K1_PUBLIC_PREFIX, this._publicKey]));
@@ -116,17 +118,19 @@ export class Secp256k1PrivateKeyExportable extends Secp256k1PrivateKey implement
 	exportPrivateKey(format: 'rawHex'): Promise<string>;
 	exportPrivateKey(format: 'multikey'): Promise<string>;
 	exportPrivateKey(format: 'jwk'): Promise<JsonWebKey>;
-	async exportPrivateKey(format: 'raw' | 'rawHex' | 'multikey' | 'jwk'): Promise<Uint8Array | string | JsonWebKey> {
+	async exportPrivateKey(
+		format: 'raw' | 'rawHex' | 'multikey' | 'jwk',
+	): Promise<Uint8Array | string | JsonWebKey> {
 		if (format === 'jwk') {
-			return toJsonWebKey(this._publicKey, this._privateKey)
+			return toJsonWebKey(this._publicKey, this._privateKey);
 		}
 
 		switch (format) {
 			case 'raw': {
-				return this._privateKey
+				return this._privateKey;
 			}
 			case 'rawHex': {
-				return toBase16(this._privateKey)
+				return toBase16(this._privateKey);
 			}
 			case 'multikey': {
 				const encoded = toBase58Btc(concatBuffers([SECP256K1_PRIVATE_PREFIX, this._privateKey]));

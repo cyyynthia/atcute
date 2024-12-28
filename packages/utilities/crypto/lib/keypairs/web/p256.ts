@@ -12,7 +12,11 @@ import {
 } from '../../utils.js';
 import { compressPoint } from '../../utils.js';
 
-const ECDSA_ALG: EcdsaParams & EcKeyImportParams = { name: 'ECDSA', namedCurve: 'P-256', hash: 'sha256' } as const;
+const ECDSA_ALG: EcdsaParams & EcKeyImportParams = {
+	name: 'ECDSA',
+	namedCurve: 'P-256',
+	hash: 'sha256',
+} as const;
 
 // NIST SP 800-186, § 3.2.1.3. P-256 -- https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf
 const P256_CURVE_ORDER = BigInt('0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551');
@@ -76,7 +80,9 @@ export class P256PublicKey implements PublicKey {
 	exportPublicKey(format: 'rawHex'): Promise<string>;
 	exportPublicKey(format: 'multikey'): Promise<string>;
 	exportPublicKey(format: 'jwk'): Promise<JsonWebKey>;
-	async exportPublicKey(format: 'raw' | 'rawHex' | 'multikey' | 'jwk'): Promise<Uint8Array | string | JsonWebKey> {
+	async exportPublicKey(
+		format: 'raw' | 'rawHex' | 'multikey' | 'jwk',
+	): Promise<Uint8Array | string | JsonWebKey> {
 		if (format === 'jwk') {
 			return await crypto.subtle.exportKey('jwk', this._publicKey);
 		}
@@ -90,10 +96,10 @@ export class P256PublicKey implements PublicKey {
 
 		switch (format) {
 			case 'raw': {
-				return rawPublicKey
+				return rawPublicKey;
 			}
 			case 'rawHex': {
-				return toBase16(rawPublicKey)
+				return toBase16(rawPublicKey);
 			}
 			case 'multikey': {
 				const encoded = toBase58Btc(concatBuffers([P256_PUBLIC_PREFIX, rawPublicKey]));
@@ -180,26 +186,25 @@ export class P256PrivateKeyExportable extends P256PrivateKey implements PrivateK
 	exportPrivateKey(format: 'rawHex'): Promise<string>;
 	exportPrivateKey(format: 'multikey'): Promise<string>;
 	exportPrivateKey(format: 'jwk'): Promise<JsonWebKey>;
-	async exportPrivateKey(format: 'raw' | 'rawHex' | 'multikey' | 'jwk'): Promise<Uint8Array | string | JsonWebKey> {
+	async exportPrivateKey(
+		format: 'raw' | 'rawHex' | 'multikey' | 'jwk',
+	): Promise<Uint8Array | string | JsonWebKey> {
 		if (format === 'jwk') {
 			return await crypto.subtle.exportKey('jwk', this._privateKey);
 		}
 
-		const pkcs8PrivateKeyPrefixOffset = PKCS8_PRIVATE_KEY_PREFIX.length + 1
+		const pkcs8PrivateKeyPrefixOffset = PKCS8_PRIVATE_KEY_PREFIX.length + 1;
 		const buffer = await crypto.subtle.exportKey('pkcs8', this._privateKey);
 		const rawPrivateKey = new Uint8Array(
-			buffer.slice(
-				pkcs8PrivateKeyPrefixOffset,
-				pkcs8PrivateKeyPrefixOffset + 32
-			),
+			buffer.slice(pkcs8PrivateKeyPrefixOffset, pkcs8PrivateKeyPrefixOffset + 32),
 		);
 
 		switch (format) {
 			case 'raw': {
-				return rawPrivateKey
+				return rawPrivateKey;
 			}
 			case 'rawHex': {
-				return toBase16(rawPrivateKey)
+				return toBase16(rawPrivateKey);
 			}
 			case 'multikey': {
 				const encoded = toBase58Btc(concatBuffers([P256_PRIVATE_PREFIX, rawPrivateKey]));
