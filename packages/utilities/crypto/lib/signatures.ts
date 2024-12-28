@@ -12,11 +12,11 @@ export const verifySig = async (
 ) => {
 	switch (key.type) {
 		case 'p256': {
-			const keypair = new P256PublicKey(key.publicKey);
+			const keypair = await P256PublicKey.importRaw(key.publicKeyBytes);
 			return await keypair.verify(sig, data, opts);
 		}
 		case 'secp256k1': {
-			const keypair = new Secp256k1PublicKey(key.publicKey);
+			const keypair = await Secp256k1PublicKey.importRaw(key.publicKeyBytes);
 			return await keypair.verify(sig, data, opts);
 		}
 	}

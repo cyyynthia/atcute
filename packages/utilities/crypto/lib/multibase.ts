@@ -1,12 +1,12 @@
 import { fromBase58Btc } from '@atcute/multibase';
 
 export type FoundPrivateKey =
-	| { type: 'p256'; privateKey: Uint8Array }
-	| { type: 'secp256k1'; privateKey: Uint8Array };
+	| { type: 'p256'; privateKeyBytes: Uint8Array }
+	| { type: 'secp256k1'; privateKeyBytes: Uint8Array };
 
 export type FoundPublicKey =
-	| { type: 'p256'; jwtAlg: 'ES256'; publicKey: Uint8Array }
-	| { type: 'secp256k1'; jwtAlg: 'ES256K'; publicKey: Uint8Array };
+	| { type: 'p256'; jwtAlg: 'ES256'; publicKeyBytes: Uint8Array }
+	| { type: 'secp256k1'; jwtAlg: 'ES256K'; publicKeyBytes: Uint8Array };
 
 const extractMultibase = (key: string): Uint8Array => {
 	if (key.length < 2 || key[0] !== 'z') {
@@ -37,10 +37,10 @@ export const parsePublicMultikey = (key: string): FoundPublicKey => {
 
 	switch (type) {
 		case 0x8024: {
-			return { type: 'p256', jwtAlg: 'ES256', publicKey };
+			return { type: 'p256', jwtAlg: 'ES256', publicKeyBytes: publicKey };
 		}
 		case 0xe701: {
-			return { type: 'secp256k1', jwtAlg: 'ES256K', publicKey };
+			return { type: 'secp256k1', jwtAlg: 'ES256K', publicKeyBytes: publicKey };
 		}
 	}
 
@@ -58,10 +58,10 @@ export const getPublicKeyFromDidController = (controller: {
 			return parsePublicMultikey(publicKeyMultibase);
 		}
 		case 'EcdsaSecp256r1VerificationKey2019': {
-			return { type: 'p256', jwtAlg: 'ES256', publicKey: extractMultibase(publicKeyMultibase) };
+			return { type: 'p256', jwtAlg: 'ES256', publicKeyBytes: extractMultibase(publicKeyMultibase) };
 		}
 		case 'EcdsaSecp256k1VerificationKey2019': {
-			return { type: 'secp256k1', jwtAlg: 'ES256K', publicKey: extractMultibase(publicKeyMultibase) };
+			return { type: 'secp256k1', jwtAlg: 'ES256K', publicKeyBytes: extractMultibase(publicKeyMultibase) };
 		}
 	}
 
@@ -79,10 +79,10 @@ export const parsePrivateMultikey = (key: string): FoundPrivateKey => {
 
 	switch (type) {
 		case 0x8626: {
-			return { type: 'p256', privateKey };
+			return { type: 'p256', privateKeyBytes: privateKey };
 		}
 		case 0x8126: {
-			return { type: 'secp256k1', privateKey };
+			return { type: 'secp256k1', privateKeyBytes: privateKey };
 		}
 	}
 

@@ -1,3 +1,7 @@
+import { toBase58Btc } from '@atcute/multibase';
+
+import type { PrivateKey } from './types.js';
+
 export const toSha256 = async (input: Uint8Array): Promise<Uint8Array> => {
 	const digest = await crypto.subtle.digest('SHA-256', input);
 	return new Uint8Array(digest);
@@ -30,7 +34,7 @@ export const concatBuffers = (bufs: Uint8Array[]): Uint8Array => {
 
 // -- Cryptographic commons --
 
-export const getSignatureS = (sig: Uint8Array): bigint => {
+const getSignatureS = (sig: Uint8Array): bigint => {
 	// Low-level signature operation; you likely want to use `normalizeSignature` and `isSignatureNormalized` instead.
 
 	// Reference: [1] RFC 7518 JSON Web Algorithms (JWA), § 3.4. Digital Signature with ECDSA -- https://datatracker.ietf.org/doc/html/rfc7518#section-3.4
@@ -46,7 +50,7 @@ export const getSignatureS = (sig: Uint8Array): bigint => {
 	return s;
 };
 
-export const setSignatureS = (sig: Uint8Array, s: bigint) => {
+const setSignatureS = (sig: Uint8Array, s: bigint): void => {
 	// Low-level signature operation; you likely want to use `normalizeSignature` and `isSignatureNormalized` instead.
 
 	// Reference: see getSignatureS
@@ -64,7 +68,7 @@ export const isSignatureNormalized = (sig: Uint8Array, curveOrder: bigint): bool
 	return getSignatureS(sig) <= curveOrder >> 1n;
 };
 
-export const normalizeSignature = (sig: Uint8Array, curveOrder: bigint) => {
+export const normalizeSignature = (sig: Uint8Array, curveOrder: bigint): Uint8Array => {
 	// Reference: [1] Bitcoin BIP 0146 -- https://github.com/bitcoin/bips/blob/665712c/bip-0146.mediawiki#low_s
 	//            [2] SEC 1, ver. 2.0, § 4.1.3 Signing Operation -- https://www.secg.org/sec1-v2.pdf
 
@@ -146,17 +150,25 @@ export const deriveEcPublicKeyFromPrivateKey = async (
 };
 
 const CHALLENGE = new Uint8Array([0x62, 0x6e, 0x75, 0x79, 0x20, 0x72, 0x20, 0x71, 0x74, 0x20, 0x3a, 0x33]);
-export const checkKeypairRelationship = async (privateKey: CryptoKey, publicKey: CryptoKey) => {
+export const checkKeypairRelationship = async (keypair: PrivateKey): Promise<void> => {
 	try {
 		// Sign and verify an arbitrary message to verify the keys are indeed related to each other.
-		const sig = await crypto.subtle.sign(privateKey.algorithm, privateKey, CHALLENGE);
-		const res = await crypto.subtle.verify(publicKey.algorithm, publicKey, sig, CHALLENGE);
-		if (res) return;
+		const sig = await keypair.sign(CHALLENGE);
+		const res = await keypair.verify(sig, CHALLENGE);
+
+		if (res) {
+			return;
+		}
 	} catch {
 		// Do nothing
 	}
 
-	throw new TypeError('keys are not related to each other');
+	checkType(false, `private and public keys are not related to each other`);
+};
+
+export const toMultikey = (prefix: Uint8Array, keyBytes: Uint8Array): string => {
+	const encoded = toBase58Btc(concatBuffers([prefix, keyBytes]));
+	return `z${encoded}`;
 };
 
 // -- Checks --

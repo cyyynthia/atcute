@@ -15,8 +15,7 @@
 		"!lib/**/*.test.ts"
 	],
 	"exports": {
-		".": "./dist/index.js",
-		"./web": "./dist/web.js"
+		".": "./dist/index.js"
 	},
 	"sideEffects": false,
 	"scripts": {
@@ -25,11 +24,11 @@
 		"prepublish": "rm -rf dist; pnpm run build"
 	},
 	"devDependencies": {
+		"@noble/curves": "^1.7.0",
 		"@types/bun": "^1.1.12"
 	},
 	"dependencies": {
 		"@atcute/multibase": "workspace:^",
-		"@noble/curves": "^1.7.0",
 		"@noble/secp256k1": "^2.1.0"
 	}
 }

@@ -1,32 +1,84 @@
 import { describe, expect, it } from 'bun:test';
 
 import { fromBase16, fromBase64 } from '@atcute/multibase';
+import { secp256k1 } from '@noble/curves/secp256k1';
 
 import { parseDidKey } from '../multibase.js';
-import { createSecp256k1Keypair, Secp256k1PrivateKey, Secp256k1PublicKey } from './secp256k1.js';
+import { toSha256 } from '../utils.js';
 
-it('can create a new keypair and reimport it', () => {
-	const keypair = createSecp256k1Keypair();
-	const privateKeyBytes = keypair.export('bytes');
+import { Secp256k1PrivateKey, Secp256k1PrivateKeyExportable, Secp256k1PublicKey } from './secp256k1.js';
 
-	const imported = new Secp256k1PrivateKey(privateKeyBytes);
+it('can create a new keypair and reimport it', async () => {
+	const keypair = await Secp256k1PrivateKeyExportable.createKeypair();
+	const privateKeyBytes = await keypair.exportPrivateKey('raw');
 
-	expect(imported.did()).toBe(keypair.did());
+	const imported = await Secp256k1PrivateKey.importRaw(privateKeyBytes);
+
+	expect(await imported.exportPublicKey('did')).toBe(await keypair.exportPublicKey('did'));
 });
 
 it('produces valid signatures', async () => {
-	const keypair = createSecp256k1Keypair();
+	const keypair = await Secp256k1PrivateKeyExportable.createKeypair();
 
 	const data = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
 	const sig = await keypair.sign(data);
 
-	const isValidSig = await keypair.verify(sig, data);
+	const hash = await toSha256(data);
 
-	expect(isValidSig).toBe(true);
+	const isValidSigNoble = secp256k1.verify(sig, hash, await keypair.exportPublicKey('raw'));
+	const isValidSigSelf = await keypair.verify(sig, data);
+
+	expect(isValidSigNoble).toBe(true);
+	expect(isValidSigSelf).toBe(true);
+});
+
+describe('.importRaw()', () => {
+	it('imports public keys', async () => {
+		const keypair = await Secp256k1PrivateKeyExportable.createKeypair();
+
+		const publicKeyBytes = await keypair.exportPublicKey('raw');
+
+		expect(Secp256k1PublicKey.importRaw(publicKeyBytes)).resolves.toBeInstanceOf(Secp256k1PublicKey);
+	});
+
+	it('imports private keys without specifying public key', async () => {
+		const keypair = await Secp256k1PrivateKeyExportable.createKeypair();
+
+		const privateKeyBytes = await keypair.exportPrivateKey('raw');
+
+		expect(Secp256k1PrivateKey.importRaw(privateKeyBytes)).resolves.toBeInstanceOf(Secp256k1PrivateKey);
+	});
+
+	it('imports keypairs', async () => {
+		const keypair = await Secp256k1PrivateKeyExportable.createKeypair();
+
+		const [privateKeyBytes, publicKeyBytes] = await Promise.all([
+			keypair.exportPrivateKey('raw'),
+			keypair.exportPublicKey('raw'),
+		]);
+
+		expect(Secp256k1PrivateKey.importRaw(privateKeyBytes, publicKeyBytes)).resolves.toBeInstanceOf(
+			Secp256k1PrivateKey,
+		);
+	});
+
+	it('throws on mismatching public/private keys', async () => {
+		const [key1, key2] = await Promise.all([
+			Secp256k1PrivateKeyExportable.createKeypair(),
+			Secp256k1PrivateKeyExportable.createKeypair(),
+		]);
+
+		const [privateKeyBytes, publicKeyBytes] = await Promise.all([
+			key1.exportPrivateKey('raw'),
+			key2.exportPublicKey('raw'),
+		]);
+
+		expect(Secp256k1PrivateKey.importRaw(privateKeyBytes, publicKeyBytes)).rejects.toThrowError(TypeError);
+	});
 });
 
 describe('interop tests', () => {
-	it('handles low-S signature', async () => {
+	it('handles valid low-S signature', async () => {
 		const payload = {
 			message: `oWVoZWxsb2V3b3JsZA`,
 			sig: `5WpdIuEUUfVUYaozsi8G0B3cWO09cgZbIIwg1t2YKdUn/FEznOndsz/qgiYb89zwxYCbB71f7yQK5Lr7NasfoA`,
@@ -39,7 +91,7 @@ describe('interop tests', () => {
 		const parsed = parseDidKey(payload.publicDidKey);
 		expect(parsed.type).toBe('secp256k1');
 
-		const keypair = new Secp256k1PublicKey(parsed.publicKey);
+		const keypair = await Secp256k1PublicKey.importRaw(parsed.publicKeyBytes);
 		const isValidSig = await keypair.verify(sigBytes, messageBytes);
 
 		expect(isValidSig).toBe(true);
@@ -58,7 +110,7 @@ describe('interop tests', () => {
 		const parsed = parseDidKey(payload.publicDidKey);
 		expect(parsed.type).toBe('secp256k1');
 
-		const keypair = new Secp256k1PublicKey(parsed.publicKey);
+		const keypair = await Secp256k1PublicKey.importRaw(parsed.publicKeyBytes);
 		const isValidSig = await keypair.verify(sigBytes, messageBytes);
 
 		expect(isValidSig).toBe(false);
@@ -77,7 +129,7 @@ describe('interop tests', () => {
 		const parsed = parseDidKey(payload.publicDidKey);
 		expect(parsed.type).toBe('secp256k1');
 
-		const keypair = new Secp256k1PublicKey(parsed.publicKey);
+		const keypair = await Secp256k1PublicKey.importRaw(parsed.publicKeyBytes);
 		const isValidSig = await keypair.verify(sigBytes, messageBytes, { allowMalleableSig: true });
 
 		expect(isValidSig).toBe(true);
@@ -96,7 +148,7 @@ describe('interop tests', () => {
 		const parsed = parseDidKey(payload.publicDidKey);
 		expect(parsed.type).toBe('secp256k1');
 
-		const keypair = new Secp256k1PublicKey(parsed.publicKey);
+		const keypair = await Secp256k1PublicKey.importRaw(parsed.publicKeyBytes);
 		const isValidSig = await keypair.verify(sigBytes, messageBytes);
 
 		expect(isValidSig).toBe(false);
@@ -115,7 +167,7 @@ describe('interop tests', () => {
 		const parsed = parseDidKey(payload.publicDidKey);
 		expect(parsed.type).toBe('secp256k1');
 
-		const keypair = new Secp256k1PublicKey(parsed.publicKey);
+		const keypair = await Secp256k1PublicKey.importRaw(parsed.publicKeyBytes);
 		const isValidSig = await keypair.verify(sigBytes, messageBytes);
 
 		expect(isValidSig).toBe(false);
@@ -147,9 +199,9 @@ describe('interop tests', () => {
 
 		for (const { privateKeyBytesHex, publicDidKey } of inputs) {
 			const privateKeyBytes = fromBase16(privateKeyBytesHex);
-			const keypair = new Secp256k1PrivateKey(privateKeyBytes);
+			const keypair = await Secp256k1PrivateKey.importRaw(privateKeyBytes);
 
-			expect<string>(keypair.did()).toBe(publicDidKey);
+			expect<string>(await keypair.exportPublicKey('did')).toBe(publicDidKey);
 		}
 	});
 });
