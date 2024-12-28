@@ -26,7 +26,7 @@ it('produces valid signatures', async () => {
 
 	const keypair = await Secp256k1PrivateKey.importRaw(privateKeyBytes);
 
-	const data = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
+	const data = Uint8Array.from([152, 84, 29, 213, 69, 13, 230, 62, 38, 206, 124, 121, 187, 144, 24, 149]);
 
 	const hash = await toSha256(data);
 	const sig = await keypair.sign(data);
@@ -43,7 +43,7 @@ it('verifies valid signatures', async () => {
 
 	const keypair = await Secp256k1PublicKey.importRaw(publicKeyBytes);
 
-	const data = new Uint8Array([8, 7, 6, 5, 4, 3, 2, 1]);
+	const data = Uint8Array.from([190, 1, 153, 17, 7, 119, 192, 24, 126, 222, 91, 27, 245, 223, 150, 162]);
 
 	const hash = await toSha256(data);
 	const sig = secp256k1.sign(hash, privateKeyBytes, { lowS: true }).toCompactRawBytes();
