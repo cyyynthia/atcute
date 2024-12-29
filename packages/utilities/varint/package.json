@@ -2,7 +2,7 @@
 	"type": "module",
 	"name": "@atcute/varint",
 	"version": "1.0.1",
-	"description": "codec for Protobuf-style varint bytes",
+	"description": "protobuf-style LEB128 varint codec library",
 	"license": "MIT",
 	"repository": {
 		"url": "https://github.com/mary-ext/atcute",

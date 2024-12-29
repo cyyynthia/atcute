@@ -2,7 +2,12 @@
 	"type": "module",
 	"name": "@atcute/car",
 	"version": "2.0.0",
-	"description": "read AT Protocol's CAR (content-addressable archive) repositories",
+	"description": "lightweight DASL CAR and atproto repository decoder for AT Protocol.",
+	"keywords": [
+		"atproto",
+		"dasl",
+		"car"
+	],
 	"license": "MIT",
 	"repository": {
 		"url": "https://github.com/mary-ext/atcute",

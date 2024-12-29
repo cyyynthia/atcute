@@ -1,12 +1,9 @@
 # @atcute/cbor
 
-DAG-CBOR codec library, focused on dealing with AT Protocol's HTTP wire format.
+lightweight [DASL dCBOR42 (deterministic CBOR with tag 42)][dasl-dcbor42] codec library for AT
+Protocol.
 
-- Only JSON types are recognized and almost nothing else, this means:
-  - No `Map` objects, it will always be plain objects with string keys
-  - No `undefined` values, it will be skipped or will throw an error
-- No tagged value support other than CID, which gets converted to a cid-link interface
-- Same goes for byte arrays, gets converted to a byte interface
+[dasl-dcbor42]: https://dasl.ing/dcbor42.html
 
 ```ts
 import { encode } from '@atcute/cbor';

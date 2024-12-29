@@ -2,7 +2,15 @@
 	"type": "module",
 	"name": "@atcute/crypto",
 	"version": "2.0.0-alpha.1",
-	"description": "cryptographic utilities",
+	"description": "lightweight atproto cryptographic library",
+	"keywords": [
+		"atproto",
+		"cryptography",
+		"p256",
+		"nistp256",
+		"k256",
+		"secp256k1"
+	],
 	"license": "MIT",
 	"repository": {
 		"url": "https://github.com/mary-ext/atcute",

@@ -1,17 +1,20 @@
 # @atcute/car
 
-CAR (content-addressable archvie) repository decoder
+lightweight [DASL CAR (content-addressable archives)][dasl-car] and atproto repository decoder
+library for AT Protocol.
+
+[dasl-car]: https://dasl.ing/car.html
 
 ```ts
-// convenient iterator for reading through an AT Protocol CAR repository
-for (const { collection, rkey, record } of iterateAtpRepo(buf)) {
-	// ...
-}
-
 // read through a CAR archive
 const { roots, iterate } = readCar(buf);
 
 for (const { cid, bytes } of iterate()) {
+	// ...
+}
+
+// convenient iterator for reading through an AT Protocol CAR repository
+for (const { collection, rkey, record } of iterateAtpRepo(buf)) {
 	// ...
 }
 ```

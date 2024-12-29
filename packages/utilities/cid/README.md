@@ -1,6 +1,8 @@
 # @atcute/cid
 
-CIDv1 codec library.
+lightweight [DASL CID][dasl-cid] codec library for AT Protocol.
+
+[dasl-cid]: https://dasl.ing/cid.html
 
 ```ts
 import * as CID from '@atcute/cid';

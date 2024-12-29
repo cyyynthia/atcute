@@ -1,6 +1,12 @@
 # @atcute/crypto
 
-cryptographic utilities
+lightweight atproto cryptographic library, supporting its two "blessed" elliptic curve cryptography
+systems:
+
+- `p256` (`nistp256`): makes use of WebCrypto API.
+- `secp256k1`: makes use of [`@noble/secp256k1`][noble-secp256k1].
+
+[noble-secp256k1]: https://github.com/paulmillr/noble-secp256k1
 
 ```ts
 import { Secp256k1PrivateKeyExportable, verifySigWithDidKey } from './index.js';

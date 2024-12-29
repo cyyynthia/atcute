@@ -1,6 +1,6 @@
 # @atcute/varint
 
-Protobuf-style varint codec library.
+protobuf-style LEB128 varint codec library.
 
 ```ts
 import { encode } from '@atcute/varint';

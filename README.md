@@ -36,13 +36,13 @@ of atcute.
 | [`ozone`](./packages/definitions/ozone): adds `tools.ozone.*` lexicons                                                 |
 | [`whitewind`](./packages/definitions/whitewind): adds `com.whtwnd.*` lexicons                                          |
 | **Utility packages**                                                                                                   |
-| [`tid`](./packages/utilities/tid): TID record key codec                                                                |
-| [`car`](./packages/utilities/car): CAR/repository decoder                                                              |
-| [`cid`](./packages/utilities/cid): CIDv1 codec                                                                         |
-| [`cbor`](./packages/utilities/cbor): DAG-CBOR codec                                                                    |
-| [`varint`](./packages/utilities/varint): Protobuf-style varint codec                                                   |
-| [`multibase`](./packages/utilities/multibase): multibase utilities                                                     |
+| [`car`](./packages/utilities/car): DASL CAR and atproto repository decoder                                             |
+| [`cbor`](./packages/utilities/cbor): DASL dCBOR42 codec                                                                |
+| [`cid`](./packages/utilities/cid): DASL CID codec                                                                      |
 | [`crypto`](./packages/utilities/crypto): cryptographic utilities                                                       |
+| [`multibase`](./packages/utilities/multibase): multibase utilities                                                     |
+| [`tid`](./packages/utilities/tid): atproto timestamp identifier codec                                                  |
+| [`varint`](./packages/utilities/varint): protobuf-style LEB128 varint codec                                            |
 | **Bluesky-specific packages**                                                                                          |
 | [`bluesky-richtext-builder`](./packages/bluesky/richtext-builder): builder pattern for Bluesky's rich text facets      |
 | [`bluesky-richtext-parser`](./packages/bluesky/richtext-parser): parse Bluesky's (extended) rich text syntax           |

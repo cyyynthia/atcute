@@ -2,7 +2,11 @@
 	"type": "module",
 	"name": "@atcute/tid",
 	"version": "1.0.1",
-	"description": "create and parse TID identifiers",
+	"description": "atproto timestamp identifier identifier codec library",
+	"keywords": [
+		"atproto",
+		"codec"
+	],
 	"license": "MIT",
 	"repository": {
 		"url": "https://github.com/mary-ext/atcute",

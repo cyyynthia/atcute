@@ -1,6 +1,6 @@
 # @atcute/tid
 
-TID record key codec
+atproto timestamp identifier codec library
 
 ```ts
 import * as TID from '@atcute/tid';
