@@ -2,7 +2,7 @@ import { toBase16, toBase64Url } from '@atcute/multibase';
 import { getPublicKey, ProjectivePoint, signAsync, utils, verify } from '@noble/secp256k1';
 
 import type { DidKeyString, PrivateKey, PrivateKeyExportable, PublicKey, VerifyOptions } from '../types.js';
-import { checkKeypairRelationship, checkUnreachable, toMultikey, toSha256 } from '../utils.js';
+import { assertUnreachable, checkKeypairRelationship, toMultikey, toSha256 } from '../utils.js';
 
 // Reference: https://atproto.com/specs/cryptography#public-key-encoding
 export const SECP256K1_PUBLIC_PREFIX = Uint8Array.from([0xe7, 0x01]);
@@ -94,7 +94,7 @@ export class Secp256k1PublicKey implements PublicKey {
 			}
 		}
 
-		checkUnreachable(format, `unknown "${format}" export format`);
+		assertUnreachable(format, `unknown "${format}" export format`);
 	}
 }
 
@@ -164,6 +164,6 @@ export class Secp256k1PrivateKeyExportable extends Secp256k1PrivateKey implement
 			}
 		}
 
-		checkUnreachable(format, `unknown "${format}" export format`);
+		assertUnreachable(format, `unknown "${format}" export format`);
 	}
 }

@@ -94,7 +94,7 @@ export const compressPoint = (coords: Uint8Array): Uint8Array => {
 
 	// 1. Check if the point is already compressed.
 	//    Value 0x04 comes from [1] Action 3.3.
-	checkType(coords[0] === 0x04, 'unexpected compressed point');
+	assertType(coords[0] === 0x04, 'unexpected compressed point');
 
 	// 2. Recover the value of N.
 	//    Given that coords is "0x04 || X || Y" ([1] Action 3.3.), N is equal to `(len(coords) - 1) / 2`.
@@ -163,7 +163,7 @@ export const checkKeypairRelationship = async (keypair: PrivateKey): Promise<voi
 		// Do nothing
 	}
 
-	checkType(false, `private and public keys are not related to each other`);
+	assertType(false, `private and public keys are not related to each other`);
 };
 
 export const toMultikey = (prefix: Uint8Array, keyBytes: Uint8Array): string => {
@@ -177,12 +177,18 @@ export const toMultikey = (prefix: Uint8Array, keyBytes: Uint8Array): string => 
 // Gotcha: https://github.com/microsoft/TypeScript/issues/53450
 type CheckFn = (condition: boolean, message: string) => asserts condition;
 
-export const checkType: CheckFn = (condition, message) => {
+export const assertType: CheckFn = (condition, message) => {
 	if (!condition) {
 		throw new TypeError(message);
 	}
 };
 
-export const checkUnreachable = (_: never, message: string): never => {
+export const assertSyntax: CheckFn = (condition, message) => {
+	if (!condition) {
+		throw new SyntaxError(message);
+	}
+};
+
+export const assertUnreachable = (_: never, message: string): never => {
 	throw new Error(message);
 };

@@ -1,5 +1,7 @@
 import { fromBase58Btc } from '@atcute/multibase';
 
+import { assertSyntax, assertType } from './utils.js';
+
 export type FoundPrivateKey =
 	| { type: 'p256'; privateKeyBytes: Uint8Array }
 	| { type: 'secp256k1'; privateKeyBytes: Uint8Array };
@@ -9,9 +11,7 @@ export type FoundPublicKey =
 	| { type: 'secp256k1'; jwtAlg: 'ES256K'; publicKeyBytes: Uint8Array };
 
 const extractMultibase = (key: string): Uint8Array => {
-	if (key.length < 2 || key[0] !== 'z') {
-		throw new Error(`not a multibase base58btc string`);
-	}
+	assertSyntax(key.length >= 2 && key[0] === 'z', `not a multibase base58btc string`);
 
 	const bytes = fromBase58Btc(key.slice(1));
 
@@ -19,18 +19,14 @@ const extractMultibase = (key: string): Uint8Array => {
 };
 
 export const parseDidKey = (key: string): FoundPublicKey => {
-	if (!key.startsWith('did:key:')) {
-		throw new Error(`not a did:key`);
-	}
+	assertSyntax(key.length >= 9 && key.startsWith('did:key:'), `not a did:key`);
 
 	return parsePublicMultikey(key.slice(8));
 };
 
 export const parsePublicMultikey = (key: string): FoundPublicKey => {
 	const bytes = extractMultibase(key);
-	if (bytes.length < 3) {
-		throw new Error(`multibase key too short`);
-	}
+	assertSyntax(bytes.length >= 3, `multikey too short`);
 
 	const type = (bytes[0] << 8) | bytes[1];
 	const publicKey = bytes.subarray(2);
@@ -44,7 +40,7 @@ export const parsePublicMultikey = (key: string): FoundPublicKey => {
 		}
 	}
 
-	throw new Error(`unsupported key type (0x${type.toString(16).padStart(4, '0')})`);
+	assertType(false, `unsupported key type (0x${type.toString(16).padStart(4, '0')})`);
 };
 
 export const getPublicKeyFromDidController = (controller: {
@@ -65,14 +61,12 @@ export const getPublicKeyFromDidController = (controller: {
 		}
 	}
 
-	throw new Error(`unsupported type (${controller.type})`);
+	assertType(false, `unsupported controller type (${controller.type})`);
 };
 
 export const parsePrivateMultikey = (key: string): FoundPrivateKey => {
 	const bytes = extractMultibase(key);
-	if (bytes.length < 3) {
-		throw new Error(`multibase key too short`);
-	}
+	assertSyntax(bytes.length >= 3, `multikey too short`);
 
 	const type = (bytes[0] << 8) | bytes[1];
 	const privateKey = bytes.subarray(2);
@@ -86,5 +80,5 @@ export const parsePrivateMultikey = (key: string): FoundPrivateKey => {
 		}
 	}
 
-	throw new Error(`unsupported key type (0x${type.toString(16).padStart(4, '0')})`);
+	assertType(false, `unsupported key type (0x${type.toString(16).padStart(4, '0')})`);
 };

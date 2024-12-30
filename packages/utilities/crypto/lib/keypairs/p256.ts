@@ -2,9 +2,9 @@ import { toBase16 } from '@atcute/multibase';
 
 import type { DidKeyString, PrivateKey, PrivateKeyExportable, PublicKey, VerifyOptions } from '../types.js';
 import {
+	assertType,
+	assertUnreachable,
 	checkKeypairRelationship,
-	checkType,
-	checkUnreachable,
 	compressPoint,
 	concatBuffers,
 	deriveEcPublicKeyFromPrivateKey,
@@ -67,9 +67,9 @@ export class P256PublicKey implements PublicKey {
 
 	static async importCryptoKey(publicKey: CryptoKey): Promise<P256PublicKey> {
 		// Type cast to make resulting code smaller
-		checkType((publicKey.algorithm as any).namedCurve === 'P-256', 'not an ECDSA P-256 key');
-		checkType(publicKey.type === 'public', 'not a public key');
-		checkType(publicKey.extractable, 'key must be extractable');
+		assertType((publicKey.algorithm as any).namedCurve === 'P-256', 'not an ECDSA P-256 key');
+		assertType(publicKey.type === 'public', 'not a public key');
+		assertType(publicKey.extractable, 'key must be extractable');
 
 		return new P256PublicKey(publicKey);
 	}
@@ -122,7 +122,7 @@ export class P256PublicKey implements PublicKey {
 			}
 		}
 
-		checkUnreachable(format, `unknown "${format}" export format`);
+		assertUnreachable(format, `unknown "${format}" export format`);
 	}
 }
 
@@ -161,15 +161,15 @@ export class P256PrivateKey extends P256PublicKey implements PrivateKey {
 		publicKey?: CryptoKey,
 	): Promise<P256PrivateKey> {
 		// Type cast to make resulting code smaller
-		checkType((privateKey.algorithm as any).namedCurve === 'P-256', '1st key is not an ECDSA P-256 key');
-		checkType(privateKey.type === 'private', '1st key is not a private key');
+		assertType((privateKey.algorithm as any).namedCurve === 'P-256', '1st key is not an ECDSA P-256 key');
+		assertType(privateKey.type === 'private', '1st key is not a private key');
 
 		if (publicKey) {
-			checkType((publicKey.algorithm as any).namedCurve === 'P-256', '2nd key is not an ECDSA P-256 key');
-			checkType(publicKey.type === 'public', '2nd key is not a public key');
-			checkType(publicKey.extractable, 'public key must be extractable');
+			assertType((publicKey.algorithm as any).namedCurve === 'P-256', '2nd key is not an ECDSA P-256 key');
+			assertType(publicKey.type === 'public', '2nd key is not a public key');
+			assertType(publicKey.extractable, 'public key must be extractable');
 		} else {
-			checkType(privateKey.extractable, 'private key must be extractable if no public key is provided');
+			assertType(privateKey.extractable, 'private key must be extractable if no public key is provided');
 		}
 
 		const keypair = new P256PrivateKey(
@@ -231,6 +231,6 @@ export class P256PrivateKeyExportable extends P256PrivateKey implements PrivateK
 			}
 		}
 
-		checkUnreachable(format, `unknown "${format}" export format`);
+		assertUnreachable(format, `unknown "${format}" export format`);
 	}
 }
