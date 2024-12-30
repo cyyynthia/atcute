@@ -4,3 +4,5 @@ export * from './keypairs/secp256k1.js';
 export * from './multibase.js';
 export * from './signatures.js';
 export * from './types.js';
+
+export { toSha256 } from './utils.js';
