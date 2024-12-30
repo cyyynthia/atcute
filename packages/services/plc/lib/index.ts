@@ -17,4 +17,5 @@ export type {
 } from './types.js';
 
 export * from './data.js';
+export * from './errors.js';
 export * from './utils.js';
