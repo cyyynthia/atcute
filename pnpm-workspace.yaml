@@ -1,7 +1,8 @@
 packages:
+  - packages/bluesky/*
   - packages/core/*
   - packages/definitions/*
-  - packages/oauth/*
-  - packages/utilities/*
-  - packages/bluesky/*
   - packages/internal/*
+  - packages/oauth/*
+  - packages/services/*
+  - packages/utilities/*

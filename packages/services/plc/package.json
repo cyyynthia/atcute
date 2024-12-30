@@ -1,0 +1,41 @@
+{
+	"type": "module",
+	"name": "@atcute/plc",
+	"version": "1.0.0",
+	"description": "lightweight did:plc utilities library",
+	"keywords": [
+		"atproto",
+		"did",
+		"did-method-plc"
+	],
+	"license": "MIT",
+	"repository": {
+		"url": "https://github.com/mary-ext/atcute",
+		"directory": "packages/services/plc"
+	},
+	"files": [
+		"dist/",
+		"lib/",
+		"!lib/**/*.bench.ts",
+		"!lib/**/*.test.ts"
+	],
+	"exports": {
+		".": "./dist/index.js"
+	},
+	"sideEffects": false,
+	"scripts": {
+		"build": "tsc --project tsconfig.build.json",
+		"test": "bun test --coverage",
+		"prepublish": "rm -rf dist; pnpm run build"
+	},
+	"devDependencies": {
+		"@types/bun": "^1.1.14"
+	},
+	"dependencies": {
+		"@atcute/cbor": "workspace:^",
+		"@atcute/cid": "workspace:^",
+		"@atcute/crypto": "workspace:^",
+		"@atcute/multibase": "workspace:^",
+		"@badrap/valita": "^0.3.16"
+	}
+}

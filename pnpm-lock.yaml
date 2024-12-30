@@ -208,6 +208,28 @@ importers:
         specifier: ^1.1.14
         version: 1.1.14
 
+  packages/services/plc:
+    dependencies:
+      '@atcute/cbor':
+        specifier: workspace:^
+        version: link:../../utilities/cbor
+      '@atcute/cid':
+        specifier: workspace:^
+        version: link:../../utilities/cid
+      '@atcute/crypto':
+        specifier: workspace:^
+        version: link:../../utilities/crypto
+      '@atcute/multibase':
+        specifier: workspace:^
+        version: link:../../utilities/multibase
+      '@badrap/valita':
+        specifier: ^0.3.16
+        version: 0.3.16
+    devDependencies:
+      '@types/bun':
+        specifier: ^1.1.14
+        version: 1.1.14
+
   packages/utilities/car:
     dependencies:
       '@atcute/cbor':

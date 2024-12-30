@@ -1,0 +1,16 @@
+export {
+	didPlcString,
+	didKeyString,
+	unsignedLegacyCreateOperation,
+	legacyCreateOperation,
+	unsignedOperation,
+	operation,
+	unsignedTombstone,
+	tombstone,
+	compatibleOperation,
+	compatibleOperationOrTombstone,
+	operationOrTombstone,
+	operationLog,
+	indexedOperation,
+	indexedOperationLog,
+} from './types.js';
