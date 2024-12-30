@@ -17,6 +17,7 @@ export function computeBundleInformation(entry: URL, entryQualifier: string, kee
 	const { metafile } = esbuild.buildSync({
 		bundle: true,
 		minify: true,
+		target: 'esnext',
 		format: 'esm',
 		splitting: true,
 		outdir: tmpDir,
