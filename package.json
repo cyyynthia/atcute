@@ -1,4 +1,5 @@
 {
+	"private": true,
 	"type": "module",
 	"scripts": {
 		"pull": "node ./scripts/pull-lexicons.js",
@@ -8,6 +9,8 @@
 	},
 	"devDependencies": {
 		"@mary/tar": "npm:@jsr/mary__tar@^0.2.4",
+		"mitata": "^1.0.23",
+		"pkg-size-report": "workspace:^",
 		"prettier": "^3.4.2",
 		"typescript": "5.7.2"
 	}
