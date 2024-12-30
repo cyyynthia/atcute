@@ -15,6 +15,7 @@ export function computeBundleInformation(entry: URL, entryQualifier: string, kee
 	const tmpDir = fs.mkdtempSync(tmpDirPrefix);
 
 	const { metafile } = esbuild.buildSync({
+		format: 'esm',
 		bundle: true,
 		minify: true,
 		outdir: tmpDir,
