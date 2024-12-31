@@ -72,12 +72,12 @@ export const validateIndexedOperation = async (
 	// Grab the previous reference
 	const proposedPrev = proposed.operation.prev;
 	if (!proposedPrev) {
-		throw new err.ImproperOperationError(proposed, `expected prev on op`);
+		throw new err.ImproperOperationError(proposed, `expected prev op`);
 	}
 
 	const indexOfPrev = history.findIndex((op) => op.cid === proposedPrev);
 	if (indexOfPrev === -1) {
-		throw new err.ImproperOperationError(proposed, `prev not found in history`);
+		throw new err.ImproperOperationError(proposed, `prev op not in history`);
 	}
 
 	// Check if the CID matches
@@ -95,8 +95,11 @@ export const validateIndexedOperation = async (
 	const nullified = history.slice(indexOfPrev + 1);
 	const lastOp = alteredHistory.at(-1);
 
-	if (!lastOp || lastOp.operation.type === 'plc_tombstone') {
+	if (!lastOp) {
 		throw new err.ImproperOperationError(proposed, `missing last op`);
+	}
+	if (lastOp.operation.type === 'plc_tombstone') {
+		throw new err.ImproperOperationError(proposed, `did is tombstoned`);
 	}
 
 	const lastOpNormalized = normalizeOp(lastOp.operation);
