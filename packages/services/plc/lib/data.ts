@@ -31,10 +31,10 @@ export const validateIndexedOperation = async (
 	did: t.DidPlcString,
 	history: t.IndexedOperation[],
 	proposed: t.IndexedOperation,
-): Promise<{ nullified: string[]; prev: string | null; ops: t.IndexedOperation[] }> => {
+): Promise<{ prev: string | null; ops: t.IndexedOperation[]; nullified: t.IndexedOperation[] }> => {
 	if (history.length === 0) {
 		if (proposed.operation.type === 'plc_tombstone') {
-			throw new err.MisorderedOperationError(proposed, 0);
+			throw new err.ImproperOperationError(proposed, `expected genesis op to not be tombstone`);
 		}
 
 		if (proposed.operation.prev !== null) {
@@ -52,7 +52,7 @@ export const validateIndexedOperation = async (
 
 			const expectedCid = CID.toString(await CID.create(CID.CODEC_DCBOR, opBytes));
 			if (expectedCid !== proposed.cid) {
-				throw new err.OperationHashError(proposed, expectedCid);
+				throw new err.InvalidHashError(proposed, expectedCid);
 			}
 		}
 
@@ -69,24 +69,24 @@ export const validateIndexedOperation = async (
 		return { nullified: [], prev: null, ops: [proposed] };
 	}
 
+	// Grab the previous reference
+	const proposedPrev = proposed.operation.prev;
+	if (!proposedPrev) {
+		throw new err.ImproperOperationError(proposed, `expected prev on op`);
+	}
+
+	const indexOfPrev = history.findIndex((op) => op.cid === proposedPrev);
+	if (indexOfPrev === -1) {
+		throw new err.ImproperOperationError(proposed, `prev not found in history`);
+	}
+
 	// Check if the CID matches
 	{
 		const opBytes = CBOR.encode(proposed.operation);
 		const expectedCid = CID.toString(await CID.create(CID.CODEC_DCBOR, opBytes));
 		if (expectedCid !== proposed.cid) {
-			throw new err.OperationHashError(proposed, expectedCid);
+			throw new err.InvalidHashError(proposed, expectedCid);
 		}
-	}
-
-	// Grab the previous reference
-	const proposedPrev = proposed.operation.prev;
-	if (!proposedPrev) {
-		throw new err.MisorderedOperationError(proposed, history.length);
-	}
-
-	const indexOfPrev = history.findIndex((op) => op.cid === proposedPrev);
-	if (indexOfPrev === -1) {
-		throw new err.MisorderedOperationError(proposed, history.length);
 	}
 
 	// Get the proposed canonical history
@@ -96,7 +96,7 @@ export const validateIndexedOperation = async (
 	const lastOp = alteredHistory.at(-1);
 
 	if (!lastOp || lastOp.operation.type === 'plc_tombstone') {
-		throw new err.MisorderedOperationError(proposed, history.length);
+		throw new err.ImproperOperationError(proposed, `missing last op`);
 	}
 
 	const lastOpNormalized = normalizeOp(lastOp.operation);
@@ -112,7 +112,16 @@ export const validateIndexedOperation = async (
 		return { nullified: [], prev: proposedPrev, ops: [...history, proposed] };
 	}
 
-	// Check if we're within the recovery window
+	// The indexed log should say that all of the nullified has `nullified: true`
+	for (let idx = 0, len = nullified.length; idx < len; idx++) {
+		const op = nullified[idx];
+
+		if (!op.nullified) {
+			throw new err.ImproperOperationError(op, `expected nullified prop to be true`);
+		}
+	}
+
+	// Check if operation within the recovery window
 	{
 		const SECOND = 1e3;
 		const MINUTE = 60 * SECOND;
@@ -142,18 +151,27 @@ export const validateIndexedOperation = async (
 		}
 	}
 
-	return { nullified: nullified.map((op) => op.cid), prev: proposedPrev, ops: [...alteredHistory, proposed] };
+	return { nullified: nullified, prev: proposedPrev, ops: [...alteredHistory, proposed] };
 };
 
 /**
  * Validate the logs returned from `/<did_identifier>/log/audit`
  */
-export const validateIndexedOperationLog = async (did: t.DidPlcString, ops: t.IndexedOperationLog) => {
-	let history: t.IndexedOperation[] = [];
+export const validateIndexedOperationLog = async (
+	did: t.DidPlcString,
+	ops: t.IndexedOperationLog,
+): Promise<{ canonical: t.IndexedOperation[]; nullified: t.IndexedOperation[] }> => {
+	let nullified: t.IndexedOperation[] = [];
+	let canonical: t.IndexedOperation[] = [];
+
 	for (const operation of ops) {
-		const result = await validateIndexedOperation(did, history, operation);
-		history = result.ops;
+		const result = await validateIndexedOperation(did, canonical, operation);
+		canonical = result.ops;
+
+		if (result.nullified.length > 0) {
+			nullified = nullified.concat(result.nullified);
+		}
 	}
 
-	return history;
+	return { canonical, nullified };
 };
