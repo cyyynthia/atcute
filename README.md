@@ -40,11 +40,10 @@ of atcute.
 | [`cbor`](./packages/utilities/cbor): DASL dCBOR42 codec                                                                |
 | [`cid`](./packages/utilities/cid): DASL CID codec                                                                      |
 | [`crypto`](./packages/utilities/crypto): cryptographic utilities                                                       |
+| [`did-plc`](./packages/services/plc): did:plc utilities                                                                |
 | [`multibase`](./packages/utilities/multibase): multibase utilities                                                     |
 | [`tid`](./packages/utilities/tid): atproto timestamp identifier codec                                                  |
 | [`varint`](./packages/utilities/varint): protobuf-style LEB128 varint codec                                            |
-| **Service packages**                                                                                                   |
-| [`plc`](./packages/services/plc): did:plc utilities                                                                    |
 | **Bluesky-specific packages**                                                                                          |
 | [`bluesky-richtext-builder`](./packages/bluesky/richtext-builder): builder pattern for Bluesky's rich text facets      |
 | [`bluesky-richtext-parser`](./packages/bluesky/richtext-parser): parse Bluesky's (extended) rich text syntax           |

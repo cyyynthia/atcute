@@ -1,6 +1,6 @@
 {
 	"type": "module",
-	"name": "@atcute/plc",
+	"name": "@atcute/did-plc",
 	"version": "1.0.0",
 	"description": "lightweight did:plc utilities library",
 	"keywords": [
@@ -11,7 +11,7 @@
 	"license": "MIT",
 	"repository": {
 		"url": "https://github.com/mary-ext/atcute",
-		"directory": "packages/services/plc"
+		"directory": "packages/utilities/did-plc"
 	},
 	"files": [
 		"dist/",

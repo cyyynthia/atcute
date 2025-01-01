@@ -211,28 +211,6 @@ importers:
         specifier: ^1.1.14
         version: 1.1.14
 
-  packages/services/plc:
-    dependencies:
-      '@atcute/cbor':
-        specifier: workspace:^
-        version: link:../../utilities/cbor
-      '@atcute/cid':
-        specifier: workspace:^
-        version: link:../../utilities/cid
-      '@atcute/crypto':
-        specifier: workspace:^
-        version: link:../../utilities/crypto
-      '@atcute/multibase':
-        specifier: workspace:^
-        version: link:../../utilities/multibase
-      '@badrap/valita':
-        specifier: ^0.3.16
-        version: 0.3.16
-    devDependencies:
-      '@types/bun':
-        specifier: ^1.1.14
-        version: 1.1.14
-
   packages/utilities/car:
     dependencies:
       '@atcute/cbor':
@@ -290,6 +268,28 @@ importers:
       '@noble/curves':
         specifier: ^1.7.0
         version: 1.7.0
+      '@types/bun':
+        specifier: ^1.1.14
+        version: 1.1.14
+
+  packages/utilities/did-plc:
+    dependencies:
+      '@atcute/cbor':
+        specifier: workspace:^
+        version: link:../cbor
+      '@atcute/cid':
+        specifier: workspace:^
+        version: link:../cid
+      '@atcute/crypto':
+        specifier: workspace:^
+        version: link:../crypto
+      '@atcute/multibase':
+        specifier: workspace:^
+        version: link:../multibase
+      '@badrap/valita':
+        specifier: ^0.3.16
+        version: 0.3.16
+    devDependencies:
       '@types/bun':
         specifier: ^1.1.14
         version: 1.1.14

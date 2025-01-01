@@ -1,10 +1,10 @@
-# @atcute/plc
+# @atcute/did-plc
 
 lightweight did:plc utilities library, currently only provides type definitions and basic
 validations around the audit log.
 
 ```ts
-import { defs, validateIndexedOperationLog } from '@atcute/plc';
+import { defs, validateIndexedOperationLog } from '@atcute/did-plc';
 
 const did = `did:plc:ragtjsm2j2vknwkz3zp4oxrd`;
 
