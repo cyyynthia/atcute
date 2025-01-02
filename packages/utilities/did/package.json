@@ -31,6 +31,6 @@
 		"@types/bun": "^1.1.14"
 	},
 	"dependencies": {
-		"@badrap/valita": "^0.3.16"
+		"@badrap/valita": "^0.4.2"
 	}
 }

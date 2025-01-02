@@ -100,11 +100,11 @@ importers:
   packages/core/lex-cli:
     dependencies:
       '@badrap/valita':
-        specifier: ^0.3.16
-        version: 0.3.16
+        specifier: ^0.4.2
+        version: 0.4.2
       '@externdefs/collider':
         specifier: ^0.1.0
-        version: 0.1.0(@badrap/valita@0.3.16)
+        version: 0.1.0(@badrap/valita@0.4.2)
       picocolors:
         specifier: ^1.1.1
         version: 1.1.1
@@ -281,8 +281,8 @@ importers:
   packages/utilities/did:
     dependencies:
       '@badrap/valita':
-        specifier: ^0.3.16
-        version: 0.3.16
+        specifier: ^0.4.2
+        version: 0.4.2
     devDependencies:
       '@types/bun':
         specifier: ^1.1.14
@@ -303,8 +303,8 @@ importers:
         specifier: workspace:^
         version: link:../multibase
       '@badrap/valita':
-        specifier: ^0.3.16
-        version: 0.3.16
+        specifier: ^0.4.2
+        version: 0.4.2
     devDependencies:
       '@types/bun':
         specifier: ^1.1.14
@@ -601,9 +601,9 @@ packages:
     resolution: {integrity: sha512-vN5p+1kl59GVKMvTHt55NzzmYVxprfJD+ql7U9NFIfKCBkYE55LYtS+WtPlaYOyzydrKI8Nezd+aZextrd+FMA==}
     engines: {node: '>=6.9.0'}
 
-  '@badrap/valita@0.3.16':
-    resolution: {integrity: sha512-slP2blSd6A+xUBgGf+wW6adGd72ojBLxemU0jXQ0fXQcsZWYQ70wTLTJggs6+oxcAqN/bvYA3Ops8SqR2Imyaw==}
-    engines: {node: '>= 16'}
+  '@badrap/valita@0.4.2':
+    resolution: {integrity: sha512-Mwmr7k2iK0Yy0POLnAFUgab2mxKYeIsYXHY7sg3jo8XFsFHbG0SBmTcktXD0uW8N4WZePKf8s68QV7QDTGSdHA==}
+    engines: {node: '>= 18'}
 
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
@@ -3654,7 +3654,7 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@badrap/valita@0.3.16': {}
+  '@badrap/valita@0.4.2': {}
 
   '@bcoe/v8-coverage@0.2.3': {}
 
@@ -3857,9 +3857,9 @@ snapshots:
   '@esbuild/win32-x64@0.24.2':
     optional: true
 
-  '@externdefs/collider@0.1.0(@badrap/valita@0.3.16)':
+  '@externdefs/collider@0.1.0(@badrap/valita@0.4.2)':
     dependencies:
-      '@badrap/valita': 0.3.16
+      '@badrap/valita': 0.4.2
 
   '@hapi/accept@6.0.3':
     dependencies:
@@ -4436,7 +4436,7 @@ snapshots:
 
   '@types/ws@8.5.13':
     dependencies:
-      '@types/node': 22.10.2
+      '@types/node': 20.12.14
 
   '@vitest/coverage-v8@2.1.8(vitest@2.1.8(@types/node@22.10.2))':
     dependencies:
