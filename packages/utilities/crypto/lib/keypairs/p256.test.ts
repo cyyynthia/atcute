@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'bun:test';
+import { describe, expect, it } from 'vitest';
 
 import { fromBase58Btc, fromBase64 } from '@atcute/multibase';
 import { p256 } from '@noble/curves/p256';
@@ -31,7 +31,7 @@ it('produces valid signatures', async () => {
 	const hash = await toSha256(data);
 	const sig = await keypair.sign(data);
 
-	expect(keypair.verify(sig, data)).resolves.toBe(true);
+	await expect(keypair.verify(sig, data)).resolves.toBe(true);
 
 	expect(p256.verify(sig, hash, publicKeyBytes, { format: 'compact', lowS: true })).toBe(true);
 	expect(p256.verify(sig, hash, publicKeyBytes, { format: 'der' })).toBe(false);
@@ -48,7 +48,7 @@ it('verifies valid signatures', async () => {
 	const hash = await toSha256(data);
 	const sig = p256.sign(hash, privateKeyBytes, { lowS: true }).toCompactRawBytes();
 
-	expect(keypair.verify(sig, data)).resolves.toBe(true);
+	await expect(keypair.verify(sig, data)).resolves.toBe(true);
 });
 
 describe('.importCryptoKey()', () => {
@@ -58,7 +58,7 @@ describe('.importCryptoKey()', () => {
 			'verify',
 		]);
 
-		expect(P256PublicKey.importCryptoKey(publicKey)).resolves.toBeInstanceOf(P256PublicKey);
+		await expect(P256PublicKey.importCryptoKey(publicKey)).resolves.toBeInstanceOf(P256PublicKey);
 	});
 
 	it('imports private keys without specifying public key', async () => {
@@ -67,7 +67,7 @@ describe('.importCryptoKey()', () => {
 			'verify',
 		]);
 
-		expect(P256PrivateKey.importCryptoKey(privateKey)).resolves.toBeInstanceOf(P256PrivateKey);
+		await expect(P256PrivateKey.importCryptoKey(privateKey)).resolves.toBeInstanceOf(P256PrivateKey);
 	});
 
 	it('imports keypairs', async () => {
@@ -76,7 +76,7 @@ describe('.importCryptoKey()', () => {
 			'verify',
 		]);
 
-		expect(P256PrivateKey.importCryptoKeyPair(cryptoKeyPair)).resolves.toBeInstanceOf(P256PrivateKey);
+		await expect(P256PrivateKey.importCryptoKeyPair(cryptoKeyPair)).resolves.toBeInstanceOf(P256PrivateKey);
 	});
 
 	it('throws on mismatching public/private keys', async () => {
@@ -89,36 +89,38 @@ describe('.importCryptoKey()', () => {
 			'verify',
 		]);
 
-		expect(P256PrivateKey.importCryptoKey(privateKey, publicKey)).rejects.toThrowError(TypeError);
+		await expect(P256PrivateKey.importCryptoKey(privateKey, publicKey)).rejects.toThrowError(TypeError);
 	});
 });
 
 describe('.importRaw()', () => {
-	it('imports public keys', () => {
+	it('imports public keys', async () => {
 		const privateKeyBytes = p256.utils.randomPrivateKey();
 		const publicKeyBytes = p256.getPublicKey(privateKeyBytes);
 
-		expect(P256PublicKey.importRaw(publicKeyBytes)).resolves.toBeInstanceOf(P256PublicKey);
+		await expect(P256PublicKey.importRaw(publicKeyBytes)).resolves.toBeInstanceOf(P256PublicKey);
 	});
 
-	it('imports private keys without specifying public key', () => {
+	it('imports private keys without specifying public key', async () => {
 		const privateKeyBytes = p256.utils.randomPrivateKey();
 
-		expect(P256PrivateKey.importRaw(privateKeyBytes)).resolves.toBeInstanceOf(P256PrivateKey);
+		await expect(P256PrivateKey.importRaw(privateKeyBytes)).resolves.toBeInstanceOf(P256PrivateKey);
 	});
 
-	it('imports keypairs', () => {
+	it('imports keypairs', async () => {
 		const privateKeyBytes = p256.utils.randomPrivateKey();
 		const publicKeyBytes = p256.getPublicKey(privateKeyBytes);
 
-		expect(P256PrivateKey.importRaw(privateKeyBytes, publicKeyBytes)).resolves.toBeInstanceOf(P256PrivateKey);
+		await expect(P256PrivateKey.importRaw(privateKeyBytes, publicKeyBytes)).resolves.toBeInstanceOf(
+			P256PrivateKey,
+		);
 	});
 
 	it('throws on mismatching public/private keys', async () => {
 		const privateKeyBytes = p256.utils.randomPrivateKey();
 		const publicKeyBytes = p256.getPublicKey(p256.utils.randomPrivateKey());
 
-		expect(P256PrivateKey.importRaw(privateKeyBytes, publicKeyBytes)).rejects.toThrowError(TypeError);
+		await expect(P256PrivateKey.importRaw(privateKeyBytes, publicKeyBytes)).rejects.toThrowError(TypeError);
 	});
 });
 
@@ -127,7 +129,7 @@ describe('.exportPublicKey()', () => {
 		const privateKeyBytes = fromBase64('b2vDXk9p9Kh7f9u0xti4Rjx4+tT28q4XYPmfI7pxzAc');
 		const keypair = await P256PrivateKey.importRaw(privateKeyBytes);
 
-		expect(keypair.exportPublicKey('did')).resolves.toBe(
+		await expect(keypair.exportPublicKey('did')).resolves.toBe(
 			'did:key:zDnaevURQesjPkE2ACUx9kwopEeKVMK2zjP7A5HacsZMmCxcB',
 		);
 	});
@@ -136,7 +138,7 @@ describe('.exportPublicKey()', () => {
 		const privateKeyBytes = fromBase64('rh7915PGO1Nh8CNyx86LmZvh7ZOccv6b4kIm0uKu9zU');
 		const keypair = await P256PrivateKey.importRaw(privateKeyBytes);
 
-		expect(keypair.exportPublicKey('jwk')).resolves.toEqual({
+		await expect(keypair.exportPublicKey('jwk')).resolves.toEqual({
 			ext: true,
 			crv: 'P-256',
 			kty: 'EC',
@@ -150,7 +152,7 @@ describe('.exportPublicKey()', () => {
 		const privateKeyBytes = fromBase64('M5deCDwbAmRW3qL9ws6vfZjSedY6XmjYxFAohQxLR9k');
 		const keypair = await P256PrivateKey.importRaw(privateKeyBytes);
 
-		expect(keypair.exportPublicKey('multikey')).resolves.toBe(
+		await expect(keypair.exportPublicKey('multikey')).resolves.toBe(
 			'zDnaep6ZR8mk6b78W8wwawTwANTmRabwCRoEbSuUsw6AHUsYB',
 		);
 	});
@@ -159,7 +161,7 @@ describe('.exportPublicKey()', () => {
 		const privateKeyBytes = fromBase64('Q3LCvMkLKh4kHr6COEpMiwXTea5ydf748jFVcFSvfZ0');
 		const keypair = await P256PrivateKey.importRaw(privateKeyBytes);
 
-		expect(keypair.exportPublicKey('rawHex')).resolves.toBe(
+		await expect(keypair.exportPublicKey('rawHex')).resolves.toBe(
 			'039474b445c1fa58cfa29018f0fc12a2e766a7caf2d22753d2e064764565c7f27e',
 		);
 	});
@@ -168,7 +170,7 @@ describe('.exportPublicKey()', () => {
 		const privateKeyBytes = fromBase64('VgaIrt49A1E64Yy0TPXatKf6VCfqd4ktkYfVOsohFDg');
 		const keypair = await P256PrivateKey.importRaw(privateKeyBytes);
 
-		expect(keypair.exportPublicKey('raw')).resolves.toEqual(
+		await expect(keypair.exportPublicKey('raw')).resolves.toEqual(
 			Uint8Array.from([
 				3, 122, 46, 223, 211, 157, 130, 79, 42, 12, 145, 102, 229, 171, 83, 54, 75, 125, 249, 21, 246, 189,
 				16, 39, 57, 48, 219, 158, 138, 171, 140, 162, 90,

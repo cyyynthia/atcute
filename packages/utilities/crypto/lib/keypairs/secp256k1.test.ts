@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'bun:test';
+import { describe, expect, it } from 'vitest';
 
 import { fromBase16, fromBase64 } from '@atcute/multibase';
 import { secp256k1 } from '@noble/curves/secp256k1';
@@ -31,7 +31,7 @@ it('produces valid signatures', async () => {
 	const hash = await toSha256(data);
 	const sig = await keypair.sign(data);
 
-	expect(keypair.verify(sig, data)).resolves.toBe(true);
+	await expect(keypair.verify(sig, data)).resolves.toBe(true);
 
 	expect(secp256k1.verify(sig, hash, publicKeyBytes, { format: 'compact', lowS: true })).toBe(true);
 	expect(secp256k1.verify(sig, hash, publicKeyBytes, { format: 'der' })).toBe(false);
@@ -48,7 +48,7 @@ it('verifies valid signatures', async () => {
 	const hash = await toSha256(data);
 	const sig = secp256k1.sign(hash, privateKeyBytes, { lowS: true }).toCompactRawBytes();
 
-	expect(keypair.verify(sig, data)).resolves.toBe(true);
+	await expect(keypair.verify(sig, data)).resolves.toBe(true);
 });
 
 describe('.importRaw()', () => {
@@ -56,20 +56,20 @@ describe('.importRaw()', () => {
 		const privateKeyBytes = secp256k1.utils.randomPrivateKey();
 		const publicKeyBytes = secp256k1.getPublicKey(privateKeyBytes);
 
-		expect(Secp256k1PublicKey.importRaw(publicKeyBytes)).resolves.toBeInstanceOf(Secp256k1PublicKey);
+		await expect(Secp256k1PublicKey.importRaw(publicKeyBytes)).resolves.toBeInstanceOf(Secp256k1PublicKey);
 	});
 
 	it('imports private keys without specifying public key', async () => {
 		const privateKeyBytes = secp256k1.utils.randomPrivateKey();
 
-		expect(Secp256k1PrivateKey.importRaw(privateKeyBytes)).resolves.toBeInstanceOf(Secp256k1PrivateKey);
+		await expect(Secp256k1PrivateKey.importRaw(privateKeyBytes)).resolves.toBeInstanceOf(Secp256k1PrivateKey);
 	});
 
 	it('imports keypairs', async () => {
 		const privateKeyBytes = secp256k1.utils.randomPrivateKey();
 		const publicKeyBytes = secp256k1.getPublicKey(privateKeyBytes);
 
-		expect(Secp256k1PrivateKey.importRaw(privateKeyBytes, publicKeyBytes)).resolves.toBeInstanceOf(
+		await expect(Secp256k1PrivateKey.importRaw(privateKeyBytes, publicKeyBytes)).resolves.toBeInstanceOf(
 			Secp256k1PrivateKey,
 		);
 	});
@@ -78,7 +78,9 @@ describe('.importRaw()', () => {
 		const privateKeyBytes = secp256k1.utils.randomPrivateKey();
 		const publicKeyBytes = secp256k1.getPublicKey(secp256k1.utils.randomPrivateKey());
 
-		expect(Secp256k1PrivateKey.importRaw(privateKeyBytes, publicKeyBytes)).rejects.toThrowError(TypeError);
+		await expect(Secp256k1PrivateKey.importRaw(privateKeyBytes, publicKeyBytes)).rejects.toThrowError(
+			TypeError,
+		);
 	});
 });
 
@@ -87,7 +89,7 @@ describe('.exportPublicKey()', () => {
 		const privateKeyBytes = fromBase64('lnyDNAlX90mUXQaBYz7fu0cM2/ySG6f9sVIH52wvsuk');
 		const keypair = await Secp256k1PrivateKey.importRaw(privateKeyBytes);
 
-		expect(keypair.exportPublicKey('did')).resolves.toBe(
+		await expect(keypair.exportPublicKey('did')).resolves.toBe(
 			'did:key:zQ3shd5jcqV5FA2nB2rzFNjwkNajyjMVJcG4AhRW8d7AtpBC4',
 		);
 	});
@@ -96,7 +98,7 @@ describe('.exportPublicKey()', () => {
 		const privateKeyBytes = fromBase64('eSSQio9cugt0MFLdy9af2tl7m1EoMO74R0SAx7v5pRc');
 		const keypair = await Secp256k1PrivateKey.importRaw(privateKeyBytes);
 
-		expect(keypair.exportPublicKey('jwk')).resolves.toEqual({
+		await expect(keypair.exportPublicKey('jwk')).resolves.toEqual({
 			alg: 'ES256K',
 			crv: 'secp256k1',
 			kty: 'EC',
@@ -110,7 +112,7 @@ describe('.exportPublicKey()', () => {
 		const privateKeyBytes = fromBase64('UuoOmwlwobPzcJoQnMhIufxyQQoFqlkW6bvXf4p1sws');
 		const keypair = await Secp256k1PrivateKey.importRaw(privateKeyBytes);
 
-		expect(keypair.exportPublicKey('multikey')).resolves.toBe(
+		await expect(keypair.exportPublicKey('multikey')).resolves.toBe(
 			'zQ3sheGhU9bT91u43Mkov7Qwv7jLNBeTbTCWiPQa8J6qfrKQ1',
 		);
 	});
@@ -119,7 +121,7 @@ describe('.exportPublicKey()', () => {
 		const privateKeyBytes = fromBase64('QHo9dl0EkFZ5XSs3kypgi/wXWjjUj7fxGA3yZe5NF3g');
 		const keypair = await Secp256k1PrivateKey.importRaw(privateKeyBytes);
 
-		expect(keypair.exportPublicKey('raw')).resolves.toEqual(
+		await expect(keypair.exportPublicKey('raw')).resolves.toEqual(
 			Uint8Array.from([
 				2, 221, 137, 228, 117, 38, 237, 54, 85, 92, 151, 237, 8, 113, 194, 67, 122, 206, 124, 170, 87, 77,
 				114, 234, 179, 169, 210, 154, 165, 3, 19, 131, 251,
@@ -131,7 +133,7 @@ describe('.exportPublicKey()', () => {
 		const privateKeyBytes = fromBase64('mLFOaqkgWJ2Pm8yOPayLmpAkehgOx9XOEO0Fj/8/ZIU');
 		const keypair = await Secp256k1PrivateKey.importRaw(privateKeyBytes);
 
-		expect(keypair.exportPublicKey('rawHex')).resolves.toBe(
+		await expect(keypair.exportPublicKey('rawHex')).resolves.toBe(
 			'03504094e4cf1edaf47c38c14470cf37cafb4a12456e718c89bc3cc3720a9f7e70',
 		);
 	});

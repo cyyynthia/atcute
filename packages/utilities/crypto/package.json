@@ -28,12 +28,14 @@
 	"sideEffects": false,
 	"scripts": {
 		"build": "tsc --project tsconfig.build.json",
-		"test": "bun test --coverage",
+		"test": "vitest run",
 		"prepublish": "rm -rf dist; pnpm run build"
 	},
 	"devDependencies": {
 		"@noble/curves": "^1.7.0",
-		"@types/bun": "^1.1.14"
+		"@types/bun": "^1.1.14",
+		"@vitest/coverage-v8": "^2.1.8",
+		"vitest": "^2.1.8"
 	},
 	"dependencies": {
 		"@atcute/multibase": "workspace:^",
