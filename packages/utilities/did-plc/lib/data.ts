@@ -7,7 +7,7 @@ import * as err from './errors.js';
 import * as t from './types.js';
 import { normalizeOp } from './utils.js';
 
-export const isSignedOpValid = async (
+export const isSignedOperationValid = async (
 	allowedKeys: t.DidKeyString[],
 	op: t.CompatibleOperationOrTombstone,
 ): Promise<t.DidKeyString | null> => {
@@ -60,7 +60,7 @@ export const validateIndexedOperation = async (
 		{
 			const { rotationKeys } = normalizeOp(proposed.operation);
 
-			const ok = isSignedOpValid(rotationKeys, proposed.operation);
+			const ok = isSignedOperationValid(rotationKeys, proposed.operation);
 			if (!ok) {
 				throw new err.InvalidSignatureError(proposed);
 			}
@@ -107,7 +107,7 @@ export const validateIndexedOperation = async (
 
 	// We're not nullifying, check if the signature is valid and move on
 	if (!firstNullified) {
-		const ok = await isSignedOpValid(lastOpNormalized.rotationKeys, proposed.operation);
+		const ok = await isSignedOperationValid(lastOpNormalized.rotationKeys, proposed.operation);
 		if (!ok) {
 			throw new err.InvalidSignatureError(proposed);
 		}
@@ -140,7 +140,7 @@ export const validateIndexedOperation = async (
 
 	// Check if the dispute is valid
 	{
-		const disputedSigner = await isSignedOpValid(lastOpNormalized.rotationKeys, firstNullified.operation);
+		const disputedSigner = await isSignedOperationValid(lastOpNormalized.rotationKeys, firstNullified.operation);
 		if (!disputedSigner) {
 			throw new err.InvalidSignatureError(firstNullified);
 		}
@@ -148,7 +148,7 @@ export const validateIndexedOperation = async (
 		const indexOfSigner = lastOpNormalized.rotationKeys.indexOf(disputedSigner);
 		const morePowerfulKeys = lastOpNormalized.rotationKeys.slice(0, indexOfSigner);
 
-		const ok = await isSignedOpValid(morePowerfulKeys, proposed.operation);
+		const ok = await isSignedOperationValid(morePowerfulKeys, proposed.operation);
 		if (!ok) {
 			throw new err.InvalidSignatureError(proposed);
 		}
