@@ -27,10 +27,10 @@
 	},
 	"imports": {
 		"#keypairs/secp256k1": {
-			"bun": "./dist/keypairs/secp256k1-web.ts",
-			"deno": "./dist/keypairs/secp256k1-web.ts",
-			"node": "./dist/keypairs/secp256k1-node.ts",
-			"default": "./dist/keypairs/secp256k1-web.ts"
+			"bun": "./dist/keypairs/secp256k1-web.js",
+			"deno": "./dist/keypairs/secp256k1-web.js",
+			"node": "./dist/keypairs/secp256k1-node.js",
+			"default": "./dist/keypairs/secp256k1-web.js"
 		}
 	},
 	"sideEffects": false,
