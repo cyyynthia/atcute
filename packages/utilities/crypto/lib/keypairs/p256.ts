@@ -20,7 +20,7 @@ export const P256_PRIVATE_PREFIX = Uint8Array.from([0x86, 0x26]);
 const ECDSA_ALG: EcdsaParams & EcKeyImportParams = {
 	name: 'ECDSA',
 	namedCurve: 'P-256',
-	hash: 'sha256',
+	hash: 'SHA-256',
 } as const;
 
 // NIST SP 800-186, § 3.2.1.3. P-256 -- https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf
