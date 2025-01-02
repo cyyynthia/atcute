@@ -40,7 +40,8 @@ of atcute.
 | [`cbor`](./packages/utilities/cbor): DASL dCBOR42 codec                                                                |
 | [`cid`](./packages/utilities/cid): DASL CID codec                                                                      |
 | [`crypto`](./packages/utilities/crypto): cryptographic utilities                                                       |
-| [`did-plc`](./packages/services/plc): did:plc utilities                                                                |
+| [`did`](./packages/utilities/did): did utilities                                                                       |
+| [`did-plc`](./packages/utilities/did-plc): did:plc utilities                                                           |
 | [`multibase`](./packages/utilities/multibase): multibase utilities                                                     |
 | [`tid`](./packages/utilities/tid): atproto timestamp identifier codec                                                  |
 | [`varint`](./packages/utilities/varint): protobuf-style LEB128 varint codec                                            |
