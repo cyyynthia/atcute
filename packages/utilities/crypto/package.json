@@ -25,6 +25,14 @@
 	"exports": {
 		".": "./dist/index.js"
 	},
+	"imports": {
+		"#keypairs/secp256k1": {
+			"bun": "./dist/keypairs/secp256k1-web.ts",
+			"deno": "./dist/keypairs/secp256k1-web.ts",
+			"node": "./dist/keypairs/secp256k1-node.ts",
+			"default": "./dist/keypairs/secp256k1-web.ts"
+		}
+	},
 	"sideEffects": false,
 	"scripts": {
 		"build": "tsc --project tsconfig.build.json",

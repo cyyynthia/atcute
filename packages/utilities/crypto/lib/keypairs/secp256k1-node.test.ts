@@ -6,7 +6,7 @@ import { secp256k1 } from '@noble/curves/secp256k1';
 import { parseDidKey } from '../multibase.js';
 import { toSha256 } from '../utils.js';
 
-import { Secp256k1PrivateKey, Secp256k1PrivateKeyExportable, Secp256k1PublicKey } from './secp256k1.js';
+import { Secp256k1PrivateKey, Secp256k1PrivateKeyExportable, Secp256k1PublicKey } from './secp256k1-node.js';
 
 it('creates a valid keypair', async () => {
 	const keypair = await Secp256k1PrivateKeyExportable.createKeypair();
@@ -99,10 +99,8 @@ describe('.exportPublicKey()', () => {
 		const keypair = await Secp256k1PrivateKey.importRaw(privateKeyBytes);
 
 		await expect(keypair.exportPublicKey('jwk')).resolves.toEqual({
-			alg: 'ES256K',
 			crv: 'secp256k1',
 			kty: 'EC',
-			key_ops: ['verify', 'sign'],
 			x: 'tvRSr4mycnI5LCglVx1Vbtc5LoLXjpjbVDYN43b2Bq0',
 			y: '8U44reoLXDXrtVKkxILGvcSFvf2Xryaq6CjqBjY1jNc',
 		});
