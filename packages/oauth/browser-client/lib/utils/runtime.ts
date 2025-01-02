@@ -53,3 +53,10 @@ export const generatePKCE = async (): Promise<{ verifier: string; challenge: str
 		method: 'S256',
 	};
 };
+
+export const generateTimestamp = (): string => {
+	const random = crypto.getRandomValues(new BigUint64Array(1));
+	const id = (BigInt(Math.floor(performance.timeOrigin + performance.now())) << 64n) | random[0];
+
+	return id.toString(36);
+};

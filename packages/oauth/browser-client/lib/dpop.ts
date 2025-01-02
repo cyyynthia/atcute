@@ -1,7 +1,7 @@
 import { database } from './environment.js';
 import type { DPoPKey } from './types/dpop.js';
 import { extractContentType } from './utils/response.js';
-import { encoder, fromBase64Url, toBase64Url, toSha256 } from './utils/runtime.js';
+import { encoder, fromBase64Url, generateTimestamp, toBase64Url, toSha256 } from './utils/runtime.js';
 
 const ES256_ALG = { name: 'ECDSA', namedCurve: 'P-256' } as const;
 
@@ -33,7 +33,7 @@ export const createDPoPSignage = (issuer: string, dpopKey: DPoPKey) => {
 		const payload = {
 			iss: issuer,
 			iat: now,
-			jti: crypto.randomUUID(),
+			jti: generateTimestamp(),
 			htm: method,
 			htu: url,
 			nonce: nonce,
