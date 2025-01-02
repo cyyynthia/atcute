@@ -3,8 +3,9 @@
 lightweight atproto cryptographic library, supporting its two "blessed" elliptic curve cryptography
 systems:
 
-- `p256` (`nistp256`): makes use of WebCrypto API.
-- `secp256k1`: makes use of [`@noble/secp256k1`][noble-secp256k1].
+- `p256`: uses WebCrypto API.
+- `secp256k1`: uses `node:crypto` on Node.js, [`@noble/secp256k1`][noble-secp256k1] everywhere else
+  (browsers, Bun, Deno).
 
 [noble-secp256k1]: https://github.com/paulmillr/noble-secp256k1
 
