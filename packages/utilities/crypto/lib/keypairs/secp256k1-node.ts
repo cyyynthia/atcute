@@ -101,7 +101,7 @@ class NodeSecp256k1PublicKey implements PublicKey {
 		const publicKeySpki = publicKey.export({ format: 'der', type: 'spki' });
 		const rawPublicKey = new Uint8Array(publicKeySpki.buffer, SPKI_PREFIX.length);
 
-		const publicKeyBytes = rawPublicKey[0] === 0x04 ? compressPoint(rawPublicKey) : rawPublicKey;
+		const publicKeyBytes = compressPoint(rawPublicKey);
 
 		switch (format) {
 			case 'did': {
