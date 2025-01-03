@@ -283,16 +283,17 @@ export const getOrderedObjectKeys = (obj: Record<string, unknown>): string[] => 
 		if (obj[valA] === undefined) {
 			// A lot of things are tucked in here xd
 			// - Pull the currently last item in the keys array at the current place
-			// - Decrease keys' length property by 1
 			// - Update saved value of array length
 			// - Decrease i by 1
-			keys[i--] = keys[(len = --keys.length)];
+			keys[i--] = keys[--len];
+			keys.length = len;
 		} else {
 			for (; j >= 0; j--) {
 				const valB = keys[j];
 
 				// Note: Don't need to check for equality, keys are always distinct.
-				if (valB.length > valA.length || valA < valB) break;
+				const cmp = valA.length - valB.length || +(valA > valB)
+				if (cmp > 0) break;
 
 				keys[j + 1] = valB;
 			}
