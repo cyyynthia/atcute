@@ -53,39 +53,84 @@ it('encodes and decodes into the same value', () => {
 	expect('empty' in decoded).toBe(false);
 });
 
-it('encodes this atproto post record', async () => {
-	const record = {
-		$type: 'app.bsky.feed.post',
-		createdAt: '2024-08-13T01:16:06.453Z',
-		embed: {
-			$type: 'app.bsky.embed.images',
-			images: [
-				{
-					alt: 'a photoshopped picture of kit with a microphone. kit is saying "meow"',
-					aspectRatio: {
-						height: 885,
-						width: 665,
-					},
-					image: {
-						$type: 'blob',
-						ref: {
-							$link: 'bafkreic6hvmy3ymbo25wxsvylu77r57uwhtnviu7vmhfsns3ab4xfal5ou',
+it('encodes atproto post records', async () => {
+	{
+		const record = {
+			$type: 'app.bsky.feed.post',
+			createdAt: '2024-08-13T01:16:06.453Z',
+			embed: {
+				$type: 'app.bsky.embed.images',
+				images: [
+					{
+						alt: 'a photoshopped picture of kit with a microphone. kit is saying "meow"',
+						aspectRatio: { height: 885, width: 665 },
+						image: {
+							$type: 'blob',
+							ref: { $link: 'bafkreic6hvmy3ymbo25wxsvylu77r57uwhtnviu7vmhfsns3ab4xfal5ou' },
+							mimeType: 'image/jpeg',
+							size: 645553,
 						},
-						mimeType: 'image/jpeg',
-						size: 645553,
 					},
+				],
+			},
+			langs: ['en'],
+			text: 'exclusively on bluesky',
+		};
+
+		const encoded = encode(record);
+
+		expect(CID.toString(await CID.create(0x71, encoded))).toBe(
+			'bafyreicbb3p4hmtm7iw3k7kiydzqp7qhufq3jdc5sbc4gxa4mxqd6bywba',
+		);
+	}
+
+	{
+		const record = {
+			$type: 'app.bsky.feed.post',
+			createdAt: '2025-01-02T23:29:41.149Z',
+			embed: {
+				$type: 'app.bsky.embed.images',
+				images: [
+					{
+						alt: '',
+						aspectRatio: { height: 2000, width: 1500 },
+						image: {
+							$type: 'blob',
+							ref: { $link: 'bafkreibdqy5qcefkcuvopnkt2tip5wzouscmp6duz377cneknktnsgfewe' },
+							mimeType: 'image/jpeg',
+							size: 531257,
+						},
+					},
+				],
+			},
+			facets: [
+				{
+					features: [{ $type: 'app.bsky.richtext.facet#tag', tag: '写真' }],
+					index: { byteEnd: 109, byteStart: 100 },
+				},
+				{
+					features: [{ $type: 'app.bsky.richtext.facet#tag', tag: '日の出' }],
+					index: { byteEnd: 122, byteStart: 110 },
+				},
+				{
+					features: [{ $type: 'app.bsky.richtext.facet#tag', tag: '日常' }],
+					index: { byteEnd: 132, byteStart: 123 },
+				},
+				{
+					features: [{ $type: 'app.bsky.richtext.facet#tag', tag: 'キリトリセカイ' }],
+					index: { byteEnd: 157, byteStart: 133 },
 				},
 			],
-		},
-		langs: ['en'],
-		text: 'exclusively on bluesky',
-	};
+			langs: ['ja'],
+			text: 'おはようございます☀️\n今日の日の出です\n寒かったけど綺麗でしたよ✨\n\n＃写真\n＃日の出\n＃日常\n＃キリトリセカイ',
+		};
 
-	const encoded = encode(record);
+		const encoded = encode(record);
 
-	expect(CID.toString(await CID.create(0x71, encoded))).toBe(
-		'bafyreicbb3p4hmtm7iw3k7kiydzqp7qhufq3jdc5sbc4gxa4mxqd6bywba',
-	);
+		expect(CID.toString(await CID.create(0x71, encoded))).toBe(
+			'bafyreiarjuvb3oppjnouaiasitt2tekkhhge6qsd4xegutblzgmihmnrhi',
+		);
+	}
 });
 
 it('decodes buffer containing two cbor objects', () => {
