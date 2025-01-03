@@ -1,11 +1,28 @@
 import { expect, it } from 'bun:test';
 
 import * as CID from '@atcute/cid';
+import { toBase16 } from '@atcute/multibase';
 
 import { decode, decodeFirst, encode, toBytes, toCidLink } from './index.js';
 
 const utf8e = new TextEncoder();
 // const utf8d = new TextDecoder();
+
+it('encodes primitives', () => {
+	expect(toBase16(encode('hello world!'))).toMatchInlineSnapshot(`"6c68656c6c6f20776f726c6421"`);
+	expect(toBase16(encode('おはようございます☀️'))).toMatchInlineSnapshot(
+		`"7821e3818ae381afe38288e38186e38194e38196e38184e381bee38199e29880efb88f"`,
+	);
+
+	expect(toBase16(encode(42))).toMatchInlineSnapshot(`"182a"`);
+	expect(toBase16(encode(3.14))).toMatchInlineSnapshot(`"fb40091eb851eb851f"`);
+	expect(toBase16(encode(Number.MAX_SAFE_INTEGER))).toMatchInlineSnapshot(`"1b001fffffffffffff"`);
+	expect(toBase16(encode(Number.MIN_SAFE_INTEGER))).toMatchInlineSnapshot(`"3b001ffffffffffffe"`);
+
+	expect(toBase16(encode(true))).toMatchInlineSnapshot(`"f5"`);
+	expect(toBase16(encode(false))).toMatchInlineSnapshot(`"f4"`);
+	expect(toBase16(encode(null))).toMatchInlineSnapshot(`"f6"`);
+});
 
 it('encodes and decodes into the same value', () => {
 	const object = {
