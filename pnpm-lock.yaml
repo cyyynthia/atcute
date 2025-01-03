@@ -14,9 +14,12 @@ importers:
       '@mary/tar':
         specifier: npm:@jsr/mary__tar@^0.2.4
         version: '@jsr/mary__tar@0.2.4'
+      '@mitata/counters':
+        specifier: ^0.0.7
+        version: 0.0.7
       mitata:
-        specifier: ^1.0.23
-        version: 1.0.23
+        specifier: ^1.0.25
+        version: 1.0.25
       pkg-size-report:
         specifier: workspace:^
         version: link:packages/internal/pkg-size-report
@@ -242,6 +245,9 @@ importers:
       '@types/bun':
         specifier: ^1.1.14
         version: 1.1.14
+      cbor-x:
+        specifier: ^1.6.0
+        version: 1.6.0
 
   packages/utilities/cid:
     dependencies:
@@ -1111,6 +1117,9 @@ packages:
 
   '@jsr/mary__tar@0.2.4':
     resolution: {integrity: sha512-jFjPcZj8DRSukPLZOt6+h74cVFdfdTMG9gzbW67YByCJTD52PEpe2sNcfCSw4mQ8hZBNgwiufCPyYL8hR9yicA==, tarball: https://npm.jsr.io/~/11/@jsr/mary__tar/0.2.4.tgz}
+
+  '@mitata/counters@0.0.7':
+    resolution: {integrity: sha512-WWC2vAp/FWtpW8+jN0TlsPfKW0pS9vFx5/+bcykV1qHcNAsUlQc1uYuP05KOM+3Zq/qo+h4PjuK3dMLgLRnItQ==}
 
   '@noble/curves@1.7.0':
     resolution: {integrity: sha512-UTMhXK9SeDhFJVrHeUJ5uZlI6ajXg10O6Ddocf9S6GjbSBVZsJo88HzKwXznNfGpMTRDyJkqMjNDPYgf0qFWnw==}
@@ -2150,8 +2159,8 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  mitata@1.0.23:
-    resolution: {integrity: sha512-G2t4HG01WGOceXNSq72IARFURXQh/9lNDdnxIfGHGHO31LTrpHuzRrZwoRqMgvgnF4uo0Cjo6SNMP8XGSbttCg==}
+  mitata@1.0.25:
+    resolution: {integrity: sha512-0v5qZtVW5vwj9FDvYfraR31BMDcRLkhSFWPTLaxx/Z3/EvScfVtAAWtMI2ArIbBcwh7P86dXh0lQWKiXQPlwYA==}
 
   mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
@@ -4011,6 +4020,8 @@ snapshots:
 
   '@jsr/mary__tar@0.2.4': {}
 
+  '@mitata/counters@0.0.7': {}
+
   '@noble/curves@1.7.0':
     dependencies:
       '@noble/hashes': 1.6.0
@@ -5219,7 +5230,7 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  mitata@1.0.23: {}
+  mitata@1.0.25: {}
 
   mkdirp-classic@0.5.3: {}
 

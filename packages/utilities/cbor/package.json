@@ -24,13 +24,14 @@
 	},
 	"sideEffects": false,
 	"scripts": {
-		"build": "tsc --project tsconfig.build.json",
+		"build": "rm -rf dist; tsc --project tsconfig.build.json",
 		"test": "bun test --coverage",
 		"prepublish": "rm -rf dist; pnpm run build"
 	},
 	"devDependencies": {
 		"@ipld/dag-cbor": "^9.2.2",
-		"@types/bun": "^1.1.14"
+		"@types/bun": "^1.1.14",
+		"cbor-x": "^1.6.0"
 	},
 	"dependencies": {
 		"@atcute/cid": "workspace:^",
