@@ -322,6 +322,12 @@ importers:
         specifier: ^1.1.14
         version: 1.1.14
 
+  packages/utilities/uint8array:
+    devDependencies:
+      '@types/bun':
+        specifier: ^1.1.14
+        version: 1.1.14
+
   packages/utilities/varint:
     devDependencies:
       '@types/bun':
@@ -4436,7 +4442,7 @@ snapshots:
 
   '@types/ws@8.5.13':
     dependencies:
-      '@types/node': 20.12.14
+      '@types/node': 22.10.2
 
   '@vitest/coverage-v8@2.1.8(vitest@2.1.8(@types/node@22.10.2))':
     dependencies:
