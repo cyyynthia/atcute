@@ -140,7 +140,10 @@ export const validateIndexedOperation = async (
 
 	// Check if the dispute is valid
 	{
-		const disputedSigner = await isSignedOperationValid(lastOpNormalized.rotationKeys, firstNullified.operation);
+		const disputedSigner = await isSignedOperationValid(
+			lastOpNormalized.rotationKeys,
+			firstNullified.operation,
+		);
 		if (!disputedSigner) {
 			throw new err.InvalidSignatureError(firstNullified);
 		}
